@@ -60,23 +60,41 @@ client.on("message", async message => {
             message.author.react
             break;
 
-        case "embedwelcome":
-            const user = message.mentions.users.first()
-            const embedDatos2 = new Discord.MessageEmbed() 
-            .setTitle("RULES:")
-            .setAuthor(client.user.username, client.user.displayAvatarURL())
+            case "embedwelcome":
+                const user = message.mentions.users.first()
+                const embedDatos2 = new Discord.MessageEmbed() 
+                .setTitle("RULES:")
+                .setAuthor(client.user.username, client.user.displayAvatarURL())
+                .setColor(0x00AE86)
+                .setFooter("This is an importan message from the gods.", client.user.avatarURL())
+                .setTimestamp()
+                .setURL("https://github.com/CraterMaik")
+                .addField("Rule 1 - No spamming.", "This includes repeated use of bot commands, misuse of spoiler tags / code blocks / special text, rapidly switching voice channels or tagging people who are not currently active in the chat.\n\n")
+                .addField("Rule 2 - No advertising or selling.", "This server is not a marketplace: do not ask for money or in-game currency, try to buy / sell / giveaway anything, or ask people to join your Discord server or community. This includes messaging any user on the server.\n\n")
+                .addField("Rule 3 - Be respectful", "You must respect all users, regardless of your liking towards them. Treat others the way you want to be treated.\n\n")
+                .addField("Rule 4 - No hate speech or trolling.", "Harassment, hate speech, racism, sexism are not allowed here. This server has a zero-tolerance policy for such messages, and you may be banned immediately without warning or recourse.\n\n")
+                .addField(" REACT WITH ✅ TO GET VERIFIED AND HAVE ACCESS TO THE SERVER!!", "_");
+                message.channel.send({ embeds: [embedDatos2] }).then(embedDatos2 => {
+                    embedDatos2.react("✅");
+                });
+                message.react.tick
+                break;
+
+        case "embedlenguage":
+            const embedDatos3 = new Discord.MessageEmbed() 
+            .setTitle("SELECT THE LENGUAGE YOU PREFEER")
             .setColor(0x00AE86)
-            .setFooter("This is an importan message from the gods.", client.user.avatarURL())
+            .setFooter("This is an importan message from the gods.")
             .setTimestamp()
             .setURL("https://github.com/CraterMaik")
-            .addField("Rule 1 - No spamming.", "This includes repeated use of bot commands, misuse of spoiler tags / code blocks / special text, rapidly switching voice channels or tagging people who are not currently active in the chat.\n\n")
-            .addField("Rule 2 - No advertising or selling.", "This server is not a marketplace: do not ask for money or in-game currency, try to buy / sell / giveaway anything, or ask people to join your Discord server or community. This includes messaging any user on the server.\n\n")
-            .addField("Rule 3 - Be respectful", "You must respect all users, regardless of your liking towards them. Treat others the way you want to be treated.\n\n")
-            .addField("Rule 4 - No hate speech or trolling.", "Harassment, hate speech, racism, sexism are not allowed here. This server has a zero-tolerance policy for such messages, and you may be banned immediately without warning or recourse.\n\n")
-            .addField(" REACT WITH ✅ TO GET VERIFIED AND HAVE ACCESS TO THE SERVER!!", "_");
-            message.channel.send({ embeds: [embedDatos2] }).then(embedDatos2 => {
-                embedDatos2.react("✅");
-            });
+            .addField("🇪🇸 ESPAÑOL", "Reacciona con esta bandera para habilitar los canales en español.")
+            .addField("🇬🇧 ENGLISH", "React with this flag to enable English channels.")
+            .addField("❗IMPORTANT", "You can react with both flags and you will have access to both channels of each theme.")
+            .addField("❗IMPORTANTE", "Puedes reaccionar con ambas banderas y tendrás acceso a ambos canales de cada tematica.")
+              message.channel.send({ embeds: [embedDatos3] }).then( embedDatos3 => {
+                  embedDatos3.react('🇪🇸');
+                  embedDatos3.react('🇬🇧');
+              });
             message.react.tick
             break;
 
@@ -90,6 +108,13 @@ client.on("message", async message => {
 
 
 client.on('messageReactionAdd', async (reaction, user) => {
+
+    let lenguageMessage = 927252662821482506;
+    let welcomeMessage = 926960221031636993;
+
+    let spanishRol = 927215843274813510;
+    let englishRol = 927224462850523156;
+
 	// When a reaction is received, check if the structure is partial
 	if (reaction.partial) {
 		// If the message this reaction belongs to was removed, the fetching might result in an API error which should be handled
@@ -102,8 +127,7 @@ client.on('messageReactionAdd', async (reaction, user) => {
 		}
 	}
 
-    if (reaction.message.id == 926960221031636993 && reaction.emoji.name === '✅') {
-        console.log("primera");
+    if (reaction.message.id == welcomeMessage && reaction.emoji.name === '✅') {
         let commonRole = reaction.message.guild.roles.cache.get("926470689249189918");
         let reactedUser =  reaction.message.guild.members.cache.find(member => member.id === user.id)
         try {
@@ -112,6 +136,32 @@ client.on('messageReactionAdd', async (reaction, user) => {
             console.log(console.error, 'Error : can\'t add the role');
          }
     }
+
+    if (reaction.message.id == lenguageMessage) {
+        let reactedUser =  reaction.message.guild.members.cache.find(member => member.id === user.id)
+        
+        if (reaction.emoji.name === '🇪🇸') {
+            let commonRole = reaction.message.guild.roles.cache.get("927215843274813510");
+            console.log(commonRole.name);
+            try {
+                reactedUser.roles.add(commonRole);
+             } catch {
+                console.log(console.error, 'Error : can\'t add the spanish role');
+             }
+        }
+        
+        if (reaction.emoji.name === '🇬🇧') {
+            let commonRole = reaction.message.guild.roles.cache.get("927224462850523156");    
+                    console.log(commonRole.name);
+            try {
+                reactedUser.roles.add(commonRole);
+             } catch {
+                console.log(console.error, 'Error : can\'t add the english role');
+             }
+        }
+    }
+
+
 	// Now the message has been cached and is fully available
 	console.log(`${reaction.message.author}'s message "${reaction.message.id}" gained a reaction!`);
 	// The reaction is now also fully available and the properties will be reflected accurately:
@@ -119,6 +169,10 @@ client.on('messageReactionAdd', async (reaction, user) => {
 });
 
 client.on('messageReactionRemove', (reaction, user) => {
+    
+    let lenguageMessage = 927252662821482506;
+    let welcomeMessage = 926960221031636993;
+
     console.log('Reaction removed; current count:', reaction.count);
     if (reaction.message.id == 926960221031636993 && reaction.emoji.name === '✅') {
         console.log("segunda");
@@ -129,6 +183,30 @@ client.on('messageReactionRemove', (reaction, user) => {
          } catch {
             console.log(console.error, 'Error : can\'t remove the role');
          }
+    }
+
+    if (reaction.message.id == lenguageMessage) {
+        let reactedUser =  reaction.message.guild.members.cache.find(member => member.id === user.id)
+        
+        if (reaction.emoji.name === '🇪🇸') {
+            let commonRole = reaction.message.guild.roles.cache.get("927215843274813510");
+            console.log(commonRole.name);
+            try {
+                reactedUser.roles.remove(commonRole);
+             } catch {
+                console.log(console.error, 'Error : can\'t remove the spanish role');
+             }
+        }
+        
+        if (reaction.emoji.name === '🇬🇧') {
+            let commonRole = reaction.message.guild.roles.cache.get("927224462850523156");    
+                    console.log(commonRole.name);
+            try {
+                reactedUser.roles.remove(commonRole);
+             } catch {
+                console.log(console.error, 'Error : can\'t remove the english role');
+             }
+        }
     }
 });
 

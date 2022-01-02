@@ -84,10 +84,6 @@ client.on("message", async message => {
             message.channel.send("COMANDOS\n- hola \n- adios \n- mejor video \n- embedTest");
             break;
     };
-
- 
-
-    
 });
 
     /*--- Reaction zone ---*/
@@ -112,17 +108,32 @@ client.on('messageReactionAdd', async (reaction, user) => {
 			return;
 		}
 	}
-   // const commonRole = interaction.options.getRole('Son of god');
-    const commonRole = client.guilds.cache.find(r => r.name == "Son of god");
 
-    if (reaction.message.id == 926476123502673971 && reaction.emoji.name === '✅') {
-        console.log("siii");
-        const user = guild.member.cache.get(interaction.id);
-        user.roles.add(commonRole);
-        //console.log(reaction.member.name);
-       // interaction.member.roles.add(commonRole);
+  //  console.log(GradeUser);
+
+    if (reaction.message.id == 926960221031636993 && reaction.emoji.name === '✅') {
+        console.log("primera");
+        let commonRole = reaction.message.guild.roles.cache.get("926470689249189918");
+        let GradeUser =  reaction.message.guild.members.cache.find(member => member.id === user.id)
+        try {
+            GradeUser.roles.add(commonRole);
+         } catch {
+            console.log(console.error, 'Error : can\'t add the role');
+         }
+    }
+/*
+    if (reaction.message.id == 926960221031636993 && reaction.message.reactions.resolve('✅')) {
+        console.log("segunda");
+        let commonRole = reaction.message.guild.roles.cache.get("926470689249189918");
+        let GradeUser =  reaction.message.guild.members.cache.find(member => member.id === user.id)
+        try {
+            GradeUser.roles.remove(commonRole);
+         } catch {
+            console.log(console.error, 'Error : can\'t remove the role');
+         }
     }
 
+*/
 	// Now the message has been cached and is fully available
 	console.log(`${reaction.message.author}'s message "${reaction.message.id}" gained a reaction!`);
 	// The reaction is now also fully available and the properties will be reflected accurately:
@@ -143,3 +154,5 @@ client.on("message", async message => {
     });
 */
 client.login(config.token);
+
+

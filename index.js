@@ -86,14 +86,7 @@ client.on("message", async message => {
     };
 });
 
-    /*--- Reaction zone ---*/
-
-    client.on('messageReactionAdd', (reaction, user) => {
-        if (reaction.emoji.name === '✅') {
-            console.log('You reacted with a thumbs up.');
-        }
-    });
-
+/*--- Reaction zone ---*/
 
 
 client.on('messageReactionAdd', async (reaction, user) => {
@@ -109,35 +102,34 @@ client.on('messageReactionAdd', async (reaction, user) => {
 		}
 	}
 
-  //  console.log(GradeUser);
-
     if (reaction.message.id == 926960221031636993 && reaction.emoji.name === '✅') {
         console.log("primera");
         let commonRole = reaction.message.guild.roles.cache.get("926470689249189918");
-        let GradeUser =  reaction.message.guild.members.cache.find(member => member.id === user.id)
+        let reactedUser =  reaction.message.guild.members.cache.find(member => member.id === user.id)
         try {
-            GradeUser.roles.add(commonRole);
+            reactedUser.roles.add(commonRole);
          } catch {
             console.log(console.error, 'Error : can\'t add the role');
          }
     }
-/*
-    if (reaction.message.id == 926960221031636993 && reaction.message.reactions.resolve('✅')) {
-        console.log("segunda");
-        let commonRole = reaction.message.guild.roles.cache.get("926470689249189918");
-        let GradeUser =  reaction.message.guild.members.cache.find(member => member.id === user.id)
-        try {
-            GradeUser.roles.remove(commonRole);
-         } catch {
-            console.log(console.error, 'Error : can\'t remove the role');
-         }
-    }
-
-*/
 	// Now the message has been cached and is fully available
 	console.log(`${reaction.message.author}'s message "${reaction.message.id}" gained a reaction!`);
 	// The reaction is now also fully available and the properties will be reflected accurately:
 	console.log(`${reaction.count} user(s) have given the same reaction to this message!`);
+});
+
+client.on('messageReactionRemove', (reaction, user) => {
+    console.log('Reaction removed; current count:', reaction.count);
+    if (reaction.message.id == 926960221031636993 && reaction.emoji.name === '✅') {
+        console.log("segunda");
+        let commonRole = reaction.message.guild.roles.cache.get("926470689249189918");
+        let reactedUser =  reaction.message.guild.members.cache.find(member => member.id === user.id)
+        try {
+            reactedUser.roles.remove(commonRole);
+         } catch {
+            console.log(console.error, 'Error : can\'t remove the role');
+         }
+    }
 });
 
     /*--- Moderator zone ---*/

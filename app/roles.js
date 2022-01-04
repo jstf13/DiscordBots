@@ -21,3 +21,5 @@ client.on("message", async message => {
             break;
     }
 });
+
+//module.exports = function(client){};

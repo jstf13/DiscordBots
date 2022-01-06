@@ -336,6 +336,7 @@ client.on("message", async message => {
 
 // Initialize the invite cache
 const invites = new Map();
+let serverId = '926465898582253618';
 
 // A pretty useful method to create a delay without blocking the whole script.
 const wait = require("timers/promises").setTimeout;
@@ -349,13 +350,17 @@ client.on("ready", async () => {
     // Fetch all Guild Invites
     const firstInvites = await guild.invites.fetch();
     // Set the key as Guild ID, and create a map which has the invite code, and the number of uses
-    invites.set(guild.id, new Map(firstInvites.map((invite) => [invite.code, invite.uses])));
+   // inviteUsers.set(firstInvites.map((invite) => [invite.uses]), users);
+   if(guild.id == serverId)
+    allTimeUsers = new Array();
+    invites.set(guild.id, new Map(firstInvites.map((invite) => [invite.code, 
+        allTimeUsers = new Array()])));
   });
 });
 
 client.on("inviteCreate", (invite) => {
 // Update cache on new invites
-invites.get(invite.guild.id).set(invite.code, invite.uses);
+invites.get(invite.guild.id).set(invite.code, allTimeUsers);
 });
 
 client.on("inviteDelete", (invite) => {
@@ -367,7 +372,8 @@ client.on("guildCreate", (guild) => {
     // We've been added to a new Guild. Let's fetch all the invites, and save it to our cache
     guild.invites.fetch().then(guildInvites => {
       // This is the same as the ready event
-      invites.set(guild.id, new Map(guildInvites.map((invite) => [invite.code, invite.uses])));
+      invites.set(guild.id, new Map(guildInvites.map((invite) => [invite.code, 
+        allTimeUsers = new Array()])));
     })
   });
   
@@ -378,24 +384,47 @@ client.on("guildCreate", (guild) => {
 
 
 client.on("guildMemberAdd", member => {
-    // To compare, we need to load the current invite list.
-    member.guild.invites.fetch().then(newInvites => {
-      // This is the *existing* invites for the guild.
-      const oldInvites = invites.get(member.guild.id);
-      console.log(oldInvites);
-      console.log(invites.member);
-      console.log(member);
-      // Look through the invites, find the one for which the uses went up.
-      const invite = newInvites.find(i => i.uses > oldInvites.get(i.code));
-      // This is just to simplify the message being sent below (inviter doesn't have a tag property)
-      const inviter = client.users.cache.get(invite.inviter.id);
-      // Get the log channel (change to your liking)
-      const logChannel = member.guild.channels.cache.find(channel => channel.name === "new-people");
-      // A real basic message with the information we need. 
-      inviter
-        ? logChannel.send(`${member.user.tag} joined using invite code ${invite.code} from ${inviter.tag}. Invite was used ${invite.uses} times since its creation.`)
-        : logChannel.send(`${member.user.tag} joined but I couldn't find through which invite.`);
-    });
+    //console.log(member);
+        // To compare, we need to load the current invite list.
+        member.guild.invites.fetch().then(newInvites => {
+        
+        // This is the *existing* invites for the guild.
+        // Look through the invites, find the one for which the uses went up.
+       // console.log(member);
+        // console.log(newInvites);
+        const ei = invites[member.guild.id];
+        const invite = newInvites.find(i => !ei.get(i.code) || ei.get(i.code).uses < i.uses);
+        console.log(invite);
+
+        //const invite = newInvites.find(i => i.guild.ownerId == '426072100265000961');
+        //console.log(invite.code);
+        try
+        {
+            let invitedUsers = invites.get(serverId).get(invite.code);
+            if(invitedUsers.includes(member.id) == false)
+            {
+                invitedUsers.push(member.id);
+                invitedUsers.push('785828317608800000');
+            }
+        // This is just to simplify the message being sent below (inviter doesn't have a tag property)
+        const inviter = client.users.cache.get(invite.inviter.id);
+        // Get the log channel (change to your liking)
+        const logChannel = member.guild.channels.cache.find(channel => channel.name === "new-people");
+        // A real basic message with the information we need. 
+        inviter
+            ? logChannel.send(`${member.user.tag} joined using invite code ${invite.code} from ${inviter.tag}. Invite was used ${invite.uses} times since its creation.`)
+            : logChannel.send(`${member.user.tag} joined but I couldn't find through which invite.`);
+         
+        } 
+        catch (error) 
+        {
+            console.log("Imposible to count the invitation. " + error);
+        }
+         }); 
+
+       //  console.log(invites);
+       //  console.log(member.id);
+        
   });
 
 /*---Close Level zone ---*/

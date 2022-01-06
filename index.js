@@ -390,10 +390,10 @@ client.on("guildMemberAdd", member => {
         
         // This is the *existing* invites for the guild.
         // Look through the invites, find the one for which the uses went up.
-       // console.log(member);
+        const oldInvites = invites.get(member.guild.id);    
+        // console.log(member);
         // console.log(newInvites);
-        const ei = invites[member.guild.id];
-        const invite = newInvites.find(i => !ei.get(i.code) || ei.get(i.code).uses < i.uses);
+        const invite = newInvites.find(i => i.uses > oldInvites.get(i.code));
         console.log(invite);
 
         //const invite = newInvites.find(i => i.guild.ownerId == '426072100265000961');

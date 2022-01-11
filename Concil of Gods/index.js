@@ -337,6 +337,9 @@ client.on("message", async message => {
 // Initialize the invite cache
 const invites = new Map();
 let serverId = '926465898582253618';
+let TestServerId = '919766844385136650';
+let botMessageChannel = "new-people";
+let testBotMessageChannel = "probando-bots";
 
 // A pretty useful method to create a delay without blocking the whole script.
 const wait = require("timers/promises").setTimeout;
@@ -351,7 +354,7 @@ client.on("ready", async () => {
     const firstInvites = await guild.invites.fetch();
     // Set the key as Guild ID, and create a map which has the invite code, and the number of uses
    // inviteUsers.set(firstInvites.map((invite) => [invite.uses]), users);
-   if(guild.id == serverId)
+   if(guild.id == TestServerId)
     allTimeUsers = new Array();
     invites.set(guild.id, new Map(firstInvites.map((invite) => [invite.code, 
         allTimeUsers = new Array()])));
@@ -383,25 +386,30 @@ client.on("guildCreate", (guild) => {
   });
 
 
-client.on("guildMemberAdd", member => {
-    //console.log(member);
+client.on("guildMemberAdd", member => {      
+      
+    
+        //console.log(member);
         // To compare, we need to load the current invite list.
         member.guild.invites.fetch().then(newInvites => {
-        
+  
         // This is the *existing* invites for the guild.
         // Look through the invites, find the one for which the uses went up.
-        const oldInvites = invites.get(member.guild.id);    
+        const oldInvites = invites.get(member.guild.id);  
+        
         // console.log(member);
         // console.log(newInvites);
         const invite = newInvites.find(i => i.uses > oldInvites.get(i.code));
-        console.log(invite);
+        //console.log(invites);
+        //console.log(invite.uses);
+        //console.log(invite);
 
         //const invite = newInvites.find(i => i.guild.ownerId == '426072100265000961');
         //console.log(invite.code);
         try
         {
-            let invitedUsers = invites.get(serverId).get(invite.code);
-            if(invitedUsers.includes(member.id) == false)
+            let invitedUsers = invites.get(TestServerId).get(invite.code);
+            if(invitedUsers == [] || invitedUsers.includes(member.id) == false)
             {
                 invitedUsers.push(member.id);
                 invitedUsers.push('785828317608800000');
@@ -409,7 +417,7 @@ client.on("guildMemberAdd", member => {
         // This is just to simplify the message being sent below (inviter doesn't have a tag property)
         const inviter = client.users.cache.get(invite.inviter.id);
         // Get the log channel (change to your liking)
-        const logChannel = member.guild.channels.cache.find(channel => channel.name === "new-people");
+        const logChannel = member.guild.channels.cache.find(channel => channel.name === testBotMessageChannel);
         // A real basic message with the information we need. 
         inviter
             ? logChannel.send(`${member.user.tag} joined using invite code ${invite.code} from ${inviter.tag}. Invite was used ${invite.uses} times since its creation.`)

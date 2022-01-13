@@ -33,6 +33,8 @@ var prefix = config.prefix;
     
 };
 
+client.invites = {};
+
 client.on("ready", () => {
     console.log(`${client.user.username} is ready!`);
     client.user.setActivity("gods stuffs")
@@ -54,6 +56,13 @@ client.on("message", async message => {
 
         case "adios":
             message.channel.send("Adios no olvides jamas mis ofrendas!");
+            break; 
+
+        case "invites":         
+            let invites = client.invites;   
+            invites.forEach(invite => 
+                message.channel.send("These are all the invites: " + invite)
+            );
             break;
 
         case "mejorvideo":
@@ -361,9 +370,11 @@ client.on("ready", async () => {
   });
 });
 
+
 client.on("inviteCreate", (invite) => {
 // Update cache on new invites
-invites.get(invite.guild.id).set(invite.code, allTimeUsers);
+//invites.get(invite.guild.id).set(invite.code, allTimeUsers);
+client.invites[invite.code] = invite.uses;
 });
 
 client.on("inviteDelete", (invite) => {
@@ -385,22 +396,49 @@ client.on("guildCreate", (guild) => {
     invites.delete(guild.id);
   });
 
+  client.on('guildMemberAdd', async (member) => {
+console.log(client.invites);
+console.log("--------------------");
 
+    const channel = member.guild.channels.cache.find(channel => channel.name === testBotMessageChannel);
+    let somethinChanged = false;
+    member.guild.invites.fetch().then(guildInvites => { //get all guild invites
+        if(somethinChanged == false){
+            guildInvites.each(invite => { //basically a for loop over the invites:
+                if(invite.uses != client.invites[invite.code]) { //if it doesn't match what we stored
+
+                    channel.send(`Welcome ${member.user.tag} Invited By ${invite.inviter.tag} with` + client.invites[invite.code])
+                    client.invites[invite.code] = invite.uses;
+                    somethinChanged = true;
+                }
+            })
+        }
+    })
+console.log(client.invites);
+console.log("End of method");
+console.log("End of method");
+console.log(" _ ");
+
+});
+/*
 client.on("guildMemberAdd", member => {      
-      
     
         //console.log(member);
         // To compare, we need to load the current invite list.
         member.guild.invites.fetch().then(newInvites => {
   
         // This is the *existing* invites for the guild.
-        // Look through the invites, find the one for which the uses went up.
         const oldInvites = invites.get(member.guild.id);  
-        
+
+        // Look through the invites, find the one for which the uses went up.
         // console.log(member);
         // console.log(newInvites);
         const invite = newInvites.find(i => i.uses > oldInvites.get(i.code));
-        //console.log(invites);
+        console.log(oldInvites);
+        console.log("------------------------");
+        console.log(newInvites.uses);
+
+        console.log("La invitacion " + invite.code + " tiene: " + invite.uses);
         //console.log(invite.uses);
         //console.log(invite);
 

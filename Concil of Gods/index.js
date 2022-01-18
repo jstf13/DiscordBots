@@ -29,11 +29,17 @@ var prefix = config.prefix;
 
     const bar = '```[' + progressText + emptyProgressText + ']' + percentageText + '```'; // Creating the bar
     return bar;
-
-    
 };
 
-client.invites = {};
+client.invites = [];
+client.usersInvitesRegister = [];
+
+// Initialize the invite cache
+const invites = new Map();
+let serverId = '926465898582253618';
+let TestServerId = '919766844385136650';
+let botMessageChannel = "new-people";
+let testBotMessageChannel = "probando-bots";
 
 client.on("ready", () => {
     console.log(`${client.user.username} is ready!`);
@@ -58,11 +64,14 @@ client.on("message", async message => {
             message.channel.send("Adios no olvides jamas mis ofrendas!");
             break; 
 
-        case "invites":         
-            let invites = client.invites;   
-            invites.forEach(invite => 
-                message.channel.send("These are all the invites: " + invite)
-            );
+        case "i":         
+        try {
+            let inv = client.usersInvitesRegister.find(inv => inv.ownerId === message.author.id);
+            message.channel.send(`${message.author.tag} have ${inv.uses} inviterd people.`)
+        } catch (error) {
+            console.log(error);
+        }
+            
             break;
 
         case "mejorvideo":
@@ -343,12 +352,7 @@ client.on("message", async message => {
 
 /*--- Level zone ---*/
 
-// Initialize the invite cache
-const invites = new Map();
-let serverId = '926465898582253618';
-let TestServerId = '919766844385136650';
-let botMessageChannel = "new-people";
-let testBotMessageChannel = "probando-bots";
+
 
 // A pretty useful method to create a delay without blocking the whole script.
 const wait = require("timers/promises").setTimeout;
@@ -370,11 +374,16 @@ client.on("ready", async () => {
   });
 });
 
-
 client.on("inviteCreate", (invite) => {
-// Update cache on new invites
-//invites.get(invite.guild.id).set(invite.code, allTimeUsers);
-client.invites[invite.code] = invite.uses;
+    var userInvites = new Object();
+    userInvites.ownerId = user.id;
+    userInvites.ownerTag = invite.inviter.tag;
+    userInvites.users = [];
+    userInvites.uses = 0;
+
+    //userInvites.invites.push(invite.code);
+    client.usersInvitesRegister.push(userInvites);
+    client.invites[invite.code] = invite.uses
 });
 
 client.on("inviteDelete", (invite) => {
@@ -389,89 +398,75 @@ client.on("guildCreate", (guild) => {
       invites.set(guild.id, new Map(guildInvites.map((invite) => [invite.code, 
         allTimeUsers = new Array()])));
     })
-  });
+});
   
-  client.on("guildDelete", (guild) => {
+client.on("guildDelete", (guild) => {
     // We've been removed from a Guild. Let's delete all their invites
     invites.delete(guild.id);
-  });
-
-  client.on('guildMemberAdd', async (member) => {
-console.log(client.invites);
-console.log("--------------------");
-
-    const channel = member.guild.channels.cache.find(channel => channel.name === testBotMessageChannel);
-    let somethinChanged = false;
-    member.guild.invites.fetch().then(guildInvites => { //get all guild invites
-        if(somethinChanged == false){
-            guildInvites.each(invite => { //basically a for loop over the invites:
-                if(invite.uses != client.invites[invite.code]) { //if it doesn't match what we stored
-
-                    channel.send(`Welcome ${member.user.tag} Invited By ${invite.inviter.tag} with` + client.invites[invite.code])
-                    client.invites[invite.code] = invite.uses;
-                    somethinChanged = true;
-                }
-            })
-        }
-    })
-console.log(client.invites);
-console.log("End of method");
-console.log("End of method");
-console.log(" _ ");
-
 });
-/*
-client.on("guildMemberAdd", member => {      
-    
-        //console.log(member);
-        // To compare, we need to load the current invite list.
-        member.guild.invites.fetch().then(newInvites => {
-  
-        // This is the *existing* invites for the guild.
-        const oldInvites = invites.get(member.guild.id);  
 
-        // Look through the invites, find the one for which the uses went up.
-        // console.log(member);
-        // console.log(newInvites);
-        const invite = newInvites.find(i => i.uses > oldInvites.get(i.code));
-        console.log(oldInvites);
-        console.log("------------------------");
-        console.log(newInvites.uses);
 
-        console.log("La invitacion " + invite.code + " tiene: " + invite.uses);
-        //console.log(invite.uses);
-        //console.log(invite);
+function createUserInvitesSpace(usedInvite) {
+    var userInvites = new Object();
+    userInvites.ownerId = usedInvite.inviterId;
+    userInvites.ownerTag = usedInvite.inviterTag;
+    userInvites.users = [];
+    userInvites.uses = 0;
 
-        //const invite = newInvites.find(i => i.guild.ownerId == '426072100265000961');
-        //console.log(invite.code);
-        try
-        {
-            let invitedUsers = invites.get(TestServerId).get(invite.code);
-            if(invitedUsers == [] || invitedUsers.includes(member.id) == false)
-            {
-                invitedUsers.push(member.id);
-                invitedUsers.push('785828317608800000');
+    client.usersInvitesRegister.push(userInvites);
+    return userInvites;
+}
+
+
+function setUserInvitesRegister(usedInvite) {
+    try {
+         let inv = client.usersInvitesRegister.find(inv => inv.ownerId === usedInvite.inviterId);
+         if(inv === undefined){
+            createUserInvitesSpace(usedInvite);
+            inv = client.usersInvitesRegister.find(inv => inv.ownerId === usedInvite.inviterId);
+         }
+        inv.users.push(usedInvite.invited);
+        inv.uses++;
+    } catch (error) {
+        console.log(error);
+    }
+   
+};
+
+client.on('guildMemberAdd', async (member) => {
+    const channel = member.guild.channels.cache.find(channel => channel.name === testBotMessageChannel);
+    let usedInvite = new Object();
+
+    member.guild.invites.fetch().then(guildInvites => { //get all guild invites
+        guildInvites.each(invite => { //basically a for loop over the invites:
+            if(invite.uses != client.invites[invite.code]) { //if it doesn't match what we stored
+                channel.send(`${member.user.tag} joined using invite code ${invite.code} from ${invite.inviter.tag}.`)
+
+                client.invites[invite.code] = invite.uses;
+
+                usedInvite.invite = invite;
+                usedInvite.inviterId = invite.inviter.id;
+                usedInvite.inviterTag = invite.inviter.tag;
+                usedInvite.invited = member.user.id;
+                setUserInvitesRegister(usedInvite);
+                
+                console.log("==============");
+                console.log(client.usersInvitesRegister);
             }
-        // This is just to simplify the message being sent below (inviter doesn't have a tag property)
-        const inviter = client.users.cache.get(invite.inviter.id);
-        // Get the log channel (change to your liking)
-        const logChannel = member.guild.channels.cache.find(channel => channel.name === testBotMessageChannel);
-        // A real basic message with the information we need. 
-        inviter
-            ? logChannel.send(`${member.user.tag} joined using invite code ${invite.code} from ${inviter.tag}. Invite was used ${invite.uses} times since its creation.`)
-            : logChannel.send(`${member.user.tag} joined but I couldn't find through which invite.`);
-         
-        } 
-        catch (error) 
-        {
-            console.log("Imposible to count the invitation. " + error);
-        }
-         }); 
+        })
+    })
+    return undefined;
+});
 
-       //  console.log(invites);
-       //  console.log(member.id);
-        
-  });
+client.on('guildMemberRemove', async (member) => {
+    inv = client.usersInvitesRegister.find(inv => inv.users.includes(member.user.id));
+    inv.users = inv.users.filter((user) => user !== member.user.id);
+    inv.uses--;
+
+    console.log(inv);
+    console.log("==============");
+    console.log(client.usersInvitesRegister);
+});
 
 /*---Close Level zone ---*/
 

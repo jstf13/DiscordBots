@@ -64,14 +64,28 @@ client.on("message", async message => {
             message.channel.send("Adios no olvides jamas mis ofrendas!");
             break; 
 
-        case "i":         
-        try {
-            let inv = client.usersInvitesRegister.find(inv => inv.ownerId === message.author.id);
-            message.channel.send(`${message.author.tag} have ${inv.uses} inviterd people.`)
-        } catch (error) {
-            console.log(error);
-        }
-            
+            case "i":         
+            try {
+                let inv = client.usersInvitesRegister.find(inv => inv.ownerId === message.author.id);
+                if (inv === undefined) {
+                    console.log("undefined");
+                }
+                else{
+                //message.channel.send(`${message.author.tag} have ${inv.uses} inviterd people.`);
+                const embedDatosInv = new Discord.MessageEmbed() 
+                .setTitle("We the concil of gods have all the control in these server and your invitations are:")
+                .setAuthor(message.author.username, message.author.displayAvatarURL())
+                .setColor(0x00AE86)
+                .setDescription("✅ arrives -> " + inv.uses + "\n ❌ leaves -> " + inv.leaves + "\n \n Total valid invites -> " + inv.totalValidInvites )
+                //.addField("Total valid invites -> " + inv.totalValidInvites, " ")
+                .setThumbnail(message.author.displayAvatarURL())
+                .setFooter("Message from the concil", client.user.avatarURL())
+                message.channel.send({ embeds: [embedDatosInv] });
+                message.author.react;
+                }
+            } catch (error) {
+                console.log(error);
+            }
             break;
 
         case "mejorvideo":
@@ -380,6 +394,8 @@ client.on("inviteCreate", (invite) => {
     userInvites.ownerTag = invite.inviter.tag;
     userInvites.users = [];
     userInvites.uses = 0;
+    userInvites.leaves = 0;
+    userInvites.totalValidInvites = 0;
 
     //userInvites.invites.push(invite.code);
     client.usersInvitesRegister.push(userInvites);
@@ -412,6 +428,8 @@ function createUserInvitesSpace(usedInvite) {
     userInvites.ownerTag = usedInvite.inviterTag;
     userInvites.users = [];
     userInvites.uses = 0;
+    userInvites.leaves = 0;
+    userInvites.totalValidInvites = 0;
 
     client.usersInvitesRegister.push(userInvites);
     return userInvites;
@@ -427,6 +445,7 @@ function setUserInvitesRegister(usedInvite) {
          }
         inv.users.push(usedInvite.invited);
         inv.uses++;
+        inv.totalValidInvites++;
     } catch (error) {
         console.log(error);
     }
@@ -460,12 +479,19 @@ client.on('guildMemberAdd', async (member) => {
 
 client.on('guildMemberRemove', async (member) => {
     inv = client.usersInvitesRegister.find(inv => inv.users.includes(member.user.id));
-    inv.users = inv.users.filter((user) => user !== member.user.id);
-    inv.uses--;
+    if (inv != undefined) {
+        inv.users = inv.users.filter((user) => user !== member.user.id);
+        inv.uses--;
+        inv.totalValidInvites--;
+        inv.leaves++;
 
-    console.log(inv);
-    console.log("==============");
-    console.log(client.usersInvitesRegister);
+        console.log(inv);
+        console.log("==============");
+        console.log(client.usersInvitesRegister);
+    }
+    else{
+        console.log(member.user.tag + "Leaves");
+    }
 });
 
 /*---Close Level zone ---*/

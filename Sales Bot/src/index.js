@@ -1,3 +1,7 @@
+require("dotenv").config();
+const { Client } = require('discord.js');
+
+console.log("holad");
 const solanaWeb3 = require('@solana/web3.js');
 const { Connection, programs } = require('@metaplex/js');
 const axios = require('axios');
@@ -16,11 +20,7 @@ const pollingInterval = 2000; // ms
 
 const marketplaceMap = {
     "MEisE1HzehtrDpAAT8PnLHjpSSkRYakotTuJRPjTpo8": "Magic Eden",
-    "HZaWndaNWHFDd9Dhk5pqUUtsmoBCqzb1MLu3NAh1VX6B": "Alpha Art",
-    "617jbWo616ggkDxvW1Le8pV38XLbVSyWY8ae6QUmGBAU": "Solsea",
     "CJsLwbP1iu5DuUikHEJnLfANgKy6stB2uFgvBBHoyxwz": "Solanart",
-    "A7p8451ktDCHq5yYaHczeLMYsjRsAkzc3hCXcSrwYHU7": "Digital Eyes",
-    "AmK5g2XcyptVLCFESBCJqoSfwV3znGoVYQnqEnaAZKWn": "Exchange Art",
 };
 
 const runSalesBot = async () => {
@@ -101,7 +101,6 @@ const getMetadata = async (tokenPubKey) => {
         console.log("error fetching metadata: ", error)
     }
 }
-
 const postSaleToDiscord = (title, price, date, signature, imageURL) => {
     axios.post(process.env.DISCORD_URL,
         {

@@ -1,7 +1,6 @@
 require("dotenv").config();
 const { Client } = require('discord.js');
 
-console.log("holad");
 const solanaWeb3 = require('@solana/web3.js');
 const { Connection, programs } = require('@metaplex/js');
 const axios = require('axios');
@@ -28,7 +27,9 @@ const runSalesBot = async () => {
 
     let signatures;
     let lastKnownSignature;
-    const options = {};
+    const options = {
+        limit: 3
+    };
     while (true) {
         try {
             signatures = await solanaConnection.getSignaturesForAddress(projectPubKey, options);
@@ -48,7 +49,7 @@ const runSalesBot = async () => {
                 const txn = await solanaConnection.getTransaction(signature);
                 if (txn.meta && txn.meta.err != null) { continue; }
 
-                const dateString = new Date(txn.blockTime * 1000).toLocaleString();
+                const dateString = new Date(txn.blockTime * 2).toLocaleString();
                 const price = Math.abs((txn.meta.preBalances[0] - txn.meta.postBalances[0])) / solanaWeb3.LAMPORTS_PER_SOL;
                 const accounts = txn.transaction.message.accountKeys;
                 const marketplaceAccount = accounts[accounts.length - 1].toString();
@@ -61,7 +62,7 @@ const runSalesBot = async () => {
                     }
 
                     printSalesInfo(dateString, price, signature, metadata.name, marketplaceMap[marketplaceAccount], metadata.image);
-                    await postSaleToDiscord(metadata.name, price, dateString, signature, metadata.image)
+                    await postSaleToDiscord(metadata.name, price, dateString, marketplaceMap[marketplaceAccount], signature, metadata.image)
                 } else {
                     console.log("not a supported marketplace sale");
                 }
@@ -101,7 +102,7 @@ const getMetadata = async (tokenPubKey) => {
         console.log("error fetching metadata: ", error)
     }
 }
-const postSaleToDiscord = (title, price, date, signature, imageURL) => {
+const postSaleToDiscord = (title, price, date, marketplace, signature, imageURL) => {
     axios.post(process.env.DISCORD_URL,
         {
             "embeds": [
@@ -115,8 +116,8 @@ const postSaleToDiscord = (title, price, date, signature, imageURL) => {
                             "inline": true
                         },
                         {
-                            "name": "Date",
-                            "value": `${date}`,
+                            "name": "Marketplace",
+                            "value": `${marketplace}`,
                             "inline": true
                         },
                         {

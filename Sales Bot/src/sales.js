@@ -1,14 +1,15 @@
 const solanaWeb3 = require('@solana/web3.js');
 const { Connection, programs } = require('@metaplex/js');
 const axios = require('axios');
-const { Client } = require('discord.js');
 
-if (!process.env.PROJECT_ADDRESS || !process.env.DISCORD_URL) {
+const config = require("../config.json")
+
+if (!config.PROJECT_ADDRESS || !config.DISCORD_URL) {
     console.log("please set your environment variables!");
     return;
 }
 
-const projectPubKey = new solanaWeb3.PublicKey(process.env.PROJECT_ADDRESS);
+const projectPubKey = new solanaWeb3.PublicKey(config.PROJECT_ADDRESS);
 const url = solanaWeb3.clusterApiUrl('mainnet-beta');
 const solanaConnection = new solanaWeb3.Connection(url, 'confirmed');
 const metaplexConnection = new Connection('mainnet-beta');
@@ -19,18 +20,6 @@ const marketplaceMap = {
     "MEisE1HzehtrDpAAT8PnLHjpSSkRYakotTuJRPjTpo8": "Magic Eden",
     "CJsLwbP1iu5DuUikHEJnLfANgKy6stB2uFgvBBHoyxwz": "Solanart",
 };
-
-module.exports = async (client) => {
-    
-    console.log(client.guild);
-    const guild = client.guild.cache.get('926465898582253618');
-    setInterval(() =>{
-        const memberCount = guild.memberCount;
-        const channel = guild.channel.cache.get('937133345932980224');
-        channel.setName(`Total Members: ${memberCount.toLocaleSring()}`);
-        console.log('Updating Member Count');
-    }, 5000);
-}
 
 const runSalesBot = async () => {
     console.log("starting sales bot...");
@@ -113,7 +102,7 @@ const getMetadata = async (tokenPubKey) => {
     }
 }
 const postSaleToDiscord = (title, price, date, marketplace, signature, imageURL) => {
-    axios.post(process.env.DISCORD_URL,
+    axios.post(config.DISCORD_URL,
         {
             "embeds": [
                 {

@@ -1,18 +1,13 @@
-require("dotenv").config();
-const { Client, Intents } = require('discord.js');
+require('./src/sales');
 
-const client = new Client({
-	intents: [Intents.FLAGS.GUILDS, Intents.FLAGS.GUILD_MESSAGES, Intents.FLAGS.GUILD_MESSAGE_REACTIONS, Intents.FLAGS.GUILD_PRESENCES],
-	partials: ['MESSAGE', 'CHANNEL', 'REACTION', 'PRESENCES'],
-});
-
-const index = require('../Sales Bot/src/index');
-const memberCounter = require('../Sales Bot/counters/member_counter');
+const config = require("./config.json");
+var {client} = require('./commands/cli');
+const memberCounter = require('./counters/member_counter');
 
 client.on("ready", () => {
-console.log("Bueno vamos");
     console.log(`${client.user.username} is ready!`);
-    client.user.setActivity("gods stuffs");
-    index(client)
-     //memberCounter(client)
+    client.user.setActivity("a sales god game");
+    memberCounter.countMembers();
 });
+
+client.login(config.token);

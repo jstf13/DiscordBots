@@ -7,6 +7,7 @@ const client = new Client({
 	partials: ['MESSAGE', 'CHANNEL', 'REACTION', 'PRESENCES', 'MEMBERS'],
 });
 
+const memberCounter = require("./counters/member_counter")
 const Discord = require("discord.js");
 const config = require("./config.json");
 var prefix = config.prefix;
@@ -44,6 +45,17 @@ let testBotMessageChannel = "probando-bots";
 client.on("ready", () => {
     console.log(`${client.user.username} is ready!`);
     client.user.setActivity("gods stuffs")
+    //memberCounter(client);
+
+    // Traslade this code to member_counter.js
+    const guild = client.guilds.cache.get("926465898582253618");
+        setInterval(() =>{
+            const memberCount = guild.memberCount;
+            const channel = guild.channels.cache.find(channel => channel.id === '937133345932980224');
+            channel.setName(`Total Members: ${memberCount}`);
+            console.log('Updating Member Count');
+        }, 5000);   
+    // Traslade this code to member_counter.js
 });
 
 client.on("message", async message => {
@@ -113,6 +125,16 @@ client.on("message", async message => {
             message.channel.send({ embeds: [embedDatos] });
             message.author.react
             break;
+            case "lore1":
+                client.on('messageCreate', message =>{
+                    message.channel.send({files: ["images/lore1.png"]});
+                });
+                break;
+            case "lore2":
+                client.on('messageCreate', message =>{
+                    message.channel.send({files: ["images/lore2.png"]});
+                });
+                break;
 
             case "embedwelcome-spanish":
                 const user = message.mentions.users.first()

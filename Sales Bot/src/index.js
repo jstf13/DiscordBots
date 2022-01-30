@@ -1,9 +1,7 @@
-require("dotenv").config();
-const { Client } = require('discord.js');
-
 const solanaWeb3 = require('@solana/web3.js');
 const { Connection, programs } = require('@metaplex/js');
 const axios = require('axios');
+const { Client } = require('discord.js');
 
 if (!process.env.PROJECT_ADDRESS || !process.env.DISCORD_URL) {
     console.log("please set your environment variables!");
@@ -22,13 +20,25 @@ const marketplaceMap = {
     "CJsLwbP1iu5DuUikHEJnLfANgKy6stB2uFgvBBHoyxwz": "Solanart",
 };
 
+module.exports = async (client) => {
+    
+    console.log(client.guild);
+    const guild = client.guild.cache.get('926465898582253618');
+    setInterval(() =>{
+        const memberCount = guild.memberCount;
+        const channel = guild.channel.cache.get('937133345932980224');
+        channel.setName(`Total Members: ${memberCount.toLocaleSring()}`);
+        console.log('Updating Member Count');
+    }, 5000);
+}
+
 const runSalesBot = async () => {
     console.log("starting sales bot...");
 
     let signatures;
     let lastKnownSignature;
     const options = {
-        limit: 3
+        limit: 1
     };
     while (true) {
         try {

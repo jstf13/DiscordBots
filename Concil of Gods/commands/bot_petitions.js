@@ -2,6 +2,7 @@ var {client} = require("./commands_file")
 
 
 const config = require("../config.json");
+
 var prefix = config.prefix;
 
 client.on("message", async message => {

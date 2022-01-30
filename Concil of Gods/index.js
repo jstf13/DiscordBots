@@ -2,7 +2,6 @@ var {client} = require("./commands/commands_file")
 
 const config = require("./config.json");
 
-const memberCounter = require("./counters/member_counter");
 require("./commands/bot_petitions");
 require("./src/reactions");
 require("./src/moderator");
@@ -31,7 +30,6 @@ require("./src/levels");
 client.on("ready", () => {
     console.log(`${client.user.username} is ready!`);
     client.user.setActivity("gods stuffs")
-    memberCounter.countMembers();
 });
 
 client.login(config.token);

@@ -1,5 +1,8 @@
 var {client} = require("../commands/commands_file");
 
+const config = require('../config.json');
+const db = require('megadb');
+let invites_db = new db.crearDB('invites');
 
 // Initialize the invite cache
 const invites = new Map();
@@ -28,23 +31,29 @@ client.on("ready", async () => {
   });
 });
 
-client.on("inviteCreate", (invite) => {
-    var userInvites = new Object();
-    userInvites.ownerId = user.id;
-    userInvites.ownerTag = invite.inviter.tag;
-    userInvites.users = [];
-    userInvites.uses = 0;
-    userInvites.leaves = 0;
-    userInvites.totalValidInvites = 0;
+client.on("inviteCreate", invite => {
+    if (!invites_db.tiene(invite.guild.id)) invites_db.establecer(invite.guild.id, {})
+    if (!invites_db.tiene(`${invite.guild.id}.${invite.inviterId}`)) {
+        invites_db.establecer(`${invite.guild.id}.${invite.inviterId}`, {user: invite.inviter.username, codes: [invite.code]}) 
+    }
+    else{
+        invites_db.push(`${invite.guild.id}.${invite.inviter.id}.codes`, invite.code);
+    }
+    // var userInvites = new Object();
+    // userInvites.ownerId = client.id;
+    // userInvites.ownerTag = invite.inviter.tag;
+    // userInvites.users = [];
+    // userInvites.uses = 0;
+    // userInvites.leaves = 0;
+    // userInvites.totalValidInvites = 0;
 
-    //userInvites.invites.push(invite.code);
-    client.usersInvitesRegister.push(userInvites);
-    client.invites[invite.code] = invite.uses
+    // //userInvites.invites.push(invite.code);
+    // client.usersInvitesRegister.push(userInvites);
+    // client.invites[invite.code] = invite.uses
 });
 
 client.on("inviteDelete", (invite) => {
-    // Delete the Invite from Cache
-    invites.get(invite.guild.id).delete(invite.code);
+    invites_db.extract(`${invite.guild.id}.${invite.channel.guild.ownerId}.codes`, invite.code);
 });
   
 client.on("guildCreate", (guild) => {

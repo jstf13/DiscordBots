@@ -1,4 +1,14 @@
 {
     "token": "OTI1ODU5NTkxMjQ0MzQ5NTIw.YczP8A.T4LCszKUurHEhyTYcuechVfBcYI",
-    "prefix": "!"   
+    "prefix": "!",   
+    "ignoredIds": [
+        {
+            "name": "Concil of Gods",
+            "id": "925859591244349520"
+        },
+        {
+            "name": "Sales God",
+            "id": "934172632541167656"
+        }
+    ]
 }

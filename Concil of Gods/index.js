@@ -1,11 +1,14 @@
 var {client} = require("./commands/commands_file")
 
 const config = require("./config.json");
-
+const db = require('megadb');
+const { Message } = require("discord.js");
 require("./commands/bot_petitions");
 require("./src/reactions");
 require("./src/moderator");
 require("./src/levels");
+require('./src/levelsHeart');
+
 
 /**
              * Create a text progress bar
@@ -20,12 +23,11 @@ require("./src/levels");
     const emptyProgress = size - progress; // Calculate the number of dash caracters to fill the empty progress side.
 
     const progressText = '▇'.repeat(progress); // Repeat is creating a string with progress * caracters in it
-    const emptyProgressText = '—'.repeat(emptyProgress); // Repeat is creating a string with empty progress * caracters in it
+    const emptyProgressText = ' '.repeat(emptyProgress); // Repeat is creating a string with empty progress * caracters in it
     const percentageText = Math.round(percentage * 100) + '%'; // Displaying the percentage of the bar
 
-    const bar = '```cs\n' +
-    `[ ${progressText} + ${emptyProgressText} + ]` + '\n' + percentageText +
-    '```'; // Creating the bar
+    const bar = '\n' +
+    '[' + progressText  + emptyProgressText + ']' + percentageText; // Creating the bar
     return bar;
 };
 

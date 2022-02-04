@@ -1,6 +1,8 @@
 var {client} = require("./commands_file")
 const Discord = require("discord.js");
+const db = require('megadb');
 
+let levels_db = new db.crearDB('levels');
 
 const config = require("../config.json");
 
@@ -89,11 +91,37 @@ client.on("message", async message => {
                 message.author.react
                 break;
 
+            case "mylevel":
+                if (!levels_db.tiene(message.guild.id)) levels_db.establecer(message.guild.id, {})
+                if (!levels_db.tiene(`${message.guild.id}.${message.author.id}`))  levels_db.establecer(`${message.guild.id}.${message.author.id}`, {xp: 0, nivel: 1})
+    
+                let { xp, nivel } = await levels_db.obtener(`${message.guild.id}.${message.author.id}`);
+                let levelup = 5 * (nivel ** 2) + 50 * nivel + 100;
+                let levelPorcentage = ((xp * 100)/levelup);
+                let barSize = 30;
+                if(levelPorcentage >= 50) barSize = 25;
+                if(levelPorcentage >= 70) barSize = 22;
+                
+                const actualLevel = new Discord.MessageEmbed() 
+                .setTitle("LEVEL VIEW")
+                .setAuthor(message.author.username, message.author.displayAvatarURL())
+                .setColor("GOLD")
+                .setFooter("Your level is not worthy of the gods", client.user.avatarURL())
+                .setThumbnail(message.author.displayAvatarURL())
+                .setTimestamp()
+                .addField("Nombre", message.author.username,  true)
+                .addField("XP", `${xp}`, true)
+                .addField("Level", `${nivel}`, true)
+                .addField("Level", '```' + progressBar(levelPorcentage, 100, barSize) + '```');
+                message.reply({ embeds: [actualLevel] });
+                break;
+
             case "lore1":
                 client.on('messageCreate', message =>{
                     message.channel.send({files: ["images/lore1.png"]});
                 });
                 break;
+
             case "lore2":
                 client.on('messageCreate', message =>{
                     message.channel.send({files: ["images/lore2.png"]});
@@ -197,7 +225,8 @@ client.on("message", async message => {
             case "progressbar":
                 message.channel.send(progressBar(99, 100, 10));
                 break;
-                case "level":
+            
+            case "level":
                 message.channel.send("Nivel 1 Muchacho!");
                 break;
 

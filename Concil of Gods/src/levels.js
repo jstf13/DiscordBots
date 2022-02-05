@@ -1,7 +1,7 @@
 var {client} = require("../commands/commands_file");
-
 const config = require('../config.json');
 const db = require('megadb');
+const { WelcomeChannel } = require("discord.js");
 let invites_db = new db.crearDB('invites');
 
 // Initialize the invite cache
@@ -9,7 +9,8 @@ const invites = new Map();
 let serverId = '926465898582253618';
 let TestServerId = '919766844385136650';
 let botMessageChannel = "new-people";
-let testBotMessageChannel = "probando-bots";
+let myWelcomeChannel = '927999666358980658';
+let modernarray = require('modernarray');
 
 // A pretty useful method to create a delay without blocking the whole script.
 const wait = require("timers/promises").setTimeout;
@@ -34,22 +35,12 @@ client.on("ready", async () => {
 client.on("inviteCreate", invite => {
     if (!invites_db.tiene(invite.guild.id)) invites_db.establecer(invite.guild.id, {})
     if (!invites_db.tiene(`${invite.guild.id}.${invite.inviterId}`)) {
-        invites_db.establecer(`${invite.guild.id}.${invite.inviterId}`, {user: invite.inviter.username, codes: [invite.code]}) 
+        invites_db.establecer(`${invite.guild.id}.${invite.inviterId}`,
+         {user: invite.inviter.username, userId: invite.inviter.id, gests: [], validInvites: 0, codes: [invite.code]}) 
     }
     else{
         invites_db.push(`${invite.guild.id}.${invite.inviter.id}.codes`, invite.code);
     }
-    // var userInvites = new Object();
-    // userInvites.ownerId = client.id;
-    // userInvites.ownerTag = invite.inviter.tag;
-    // userInvites.users = [];
-    // userInvites.uses = 0;
-    // userInvites.leaves = 0;
-    // userInvites.totalValidInvites = 0;
-
-    // //userInvites.invites.push(invite.code);
-    // client.usersInvitesRegister.push(userInvites);
-    // client.invites[invite.code] = invite.uses
 });
 
 client.on("inviteDelete", (invite) => {
@@ -102,24 +93,15 @@ function setUserInvitesRegister(usedInvite) {
 };
 
 client.on('guildMemberAdd', async (member) => {
-    const channel = member.guild.channels.cache.find(channel => channel.name === testBotMessageChannel);
-    let usedInvite = new Object();
+    const channel = member.guild.channels.cache.find(channel => channel.id === myWelcomeChannel);
 
     member.guild.invites.fetch().then(guildInvites => { //get all guild invites
         guildInvites.each(invite => { //basically a for loop over the invites:
             if(invite.uses != client.invites[invite.code]) { //if it doesn't match what we stored
                 channel.send(`${member.user.tag} joined using invite code ${invite.code} from ${invite.inviter.tag}.`)
-
-                client.invites[invite.code] = invite.uses;
-
-                usedInvite.invite = invite;
-                usedInvite.inviterId = invite.inviter.id;
-                usedInvite.inviterTag = invite.inviter.tag;
-                usedInvite.invited = member.user.id;
-                setUserInvitesRegister(usedInvite);
                 
-                console.log("==============");
-                console.log(client.usersInvitesRegister);
+                invites_db.push(`${invite.guild.id}.${invite.inviter.id}.gests`, member.user.id);
+                invites_db.sumar(`${invite.guild.id}.${invite.inviter.id}.validInvites`, 1);
             }
         })
     })
@@ -127,6 +109,21 @@ client.on('guildMemberAdd', async (member) => {
 });
 
 client.on('guildMemberRemove', async (member) => {
+    userWhoInvite = 0;
+    let newUser;
+    invites_db.find(`${member.guild.id}`, (thisUser) => thisUser.gests.includes(member.id))
+    .then( thisUser =>{
+        for (let i = 0; i <= thisUser.gests.length; i++) {
+            if(thisUser.gests[i] === member.id){
+                modernarray.popByIndex(thisUser.gests, i);
+                 invites_db.sumar(`${member.guild.id}.${thisUser.userId}.validInvites`, -1);
+            console.log(thisUser);
+                }
+        }
+        invites_db.establecer(`${member.guild.id}.${thisUser.userId}`, thisUser)
+    })
+    console.log("member.guild.id= " + member.guild.id);
+
     inv = client.usersInvitesRegister.find(inv => inv.users.includes(member.user.id));
     if (inv != undefined) {
         inv.users = inv.users.filter((user) => user !== member.user.id);

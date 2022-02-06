@@ -3,6 +3,7 @@ const Discord = require("discord.js");
 const db = require('megadb');
 
 let levels_db = new db.crearDB('levels');
+let invites_db = new db.crearDB('invites');
 
 const config = require("../config.json");
 
@@ -41,24 +42,31 @@ client.on("message", async message => {
                 message.channel.send("Adios no olvides jamas mis ofrendas!");
                 break; 
 
-            case "i":         
+            case "invites":         
             try {
-                let inv = client.usersInvitesRegister.find(inv => inv.ownerId === message.author.id);
-                if (inv === undefined) {
-                    console.log("undefined");
-                }
-                else{
-                //message.channel.send(`${message.author.tag} have ${inv.uses} inviterd people.`);
+                let valInvites;
+                let leavInvites;
+                let inv = invites_db.find(`${message.guild.id}`, thisUser => thisUser.userId === message.author.id)
+                .then(thisUser => { 
+                     valInvites = thisUser.validInvites;
+                     leavInvites = thisUser.leaves;
+                     
                 const embedDatosInv = new Discord.MessageEmbed() 
                 .setTitle("We the concil of gods have all the control in these server and your invitations are:")
                 .setAuthor(message.author.username, message.author.displayAvatarURL())
                 .setColor(0x00AE86)
-                .setDescription("✅ arrives -> " + inv.uses + "\n ❌ leaves -> " + inv.leaves + "\n \n Total valid invites -> " + inv.totalValidInvites )
-                //.addField("Total valid invites -> " + inv.totalValidInvites, " ")
+                
+                .addField("-------------------- \n ✅ Total valid invites -> " + valInvites, "--------------------")
+                .addField("❌ leaves -> " + leavInvites, "--------------------")
                 .setThumbnail(message.author.displayAvatarURL())
                 .setFooter("Message from the concil", client.user.avatarURL())
                 message.channel.send({ embeds: [embedDatosInv] });
                 message.author.react;
+                
+            
+                    });
+                if (inv === undefined) {
+                    console.log("undefined");
                 }
             } catch (error) {
                 console.log(error);
@@ -91,7 +99,7 @@ client.on("message", async message => {
                 message.author.react
                 break;
 
-            case "mylevel":
+            case "level":
                 if (!levels_db.tiene(message.guild.id)) levels_db.establecer(message.guild.id, {})
                 if (!levels_db.tiene(`${message.guild.id}.${message.author.id}`))  levels_db.establecer(`${message.guild.id}.${message.author.id}`, {xp: 0, nivel: 1})
     

@@ -3,6 +3,7 @@ const config = require('../config.json');
 const db = require('megadb');
 const { WelcomeChannel } = require("discord.js");
 let invites_db = new db.crearDB('invites');
+let level_db = new db.crearDB('levels');
 
 // Initialize the invite cache
 const invites = new Map();
@@ -14,6 +15,31 @@ let modernarray = require('modernarray');
 
 // A pretty useful method to create a delay without blocking the whole script.
 const wait = require("timers/promises").setTimeout;
+
+function promoteToWL(invite) {
+    console.log(haveTheLevel(invite));
+    if(haveTheLevel(invite) === true){
+        let WLRoleId = "937127841592651786";
+        let WLRole = invite.guild.roles.cache.get(WLRoleId);
+
+        console.log("deberia de agreegar");
+        userToAddRole = invite.guild.members.cache.find(thisMember => thisMember.userId === invite.inviter.id)
+        userToAddRole.roles.add(WLRole);
+    }
+}
+
+// error al controlar con find
+function haveTheLevel(invite) {
+    level_db.find(`${invite.guild.id}`, thisUser => thisUser.userId === invite.inviter)
+    .then(thisUser => {
+        console.log("thisUser " + thisUser);
+        if(thisUser.nivel >= config.levelToEnterWL){
+            console.log("thisUser have the level " + thisUser);
+            if(thisUser != undefined) return true;
+            return false;
+        }
+    })
+}
 
 client.on("ready", async () => {
   // "ready" isn't really ready. We need to wait a spell.
@@ -102,6 +128,15 @@ client.on('guildMemberAdd', async (member) => {
                 
                 invites_db.push(`${invite.guild.id}.${invite.inviter.id}.gests`, member.user.id);
                 invites_db.sumar(`${invite.guild.id}.${invite.inviter.id}.validInvites`, 1);
+
+                invites_db.find(`${invite.guild.id}`, thisUser => thisUser.userId === invite.inviter.id)
+                .then(thisUser => { 
+                    if (thisUser.validInvites >= config.invitesToEnterWL) {
+                        console.log("enough invitations. Inviter = " + invite.inviter)
+                        promoteToWL(invite);
+                    }
+                    
+                })
             }
         })
     })

@@ -5,6 +5,25 @@ require('../commands/commands_file')
 const db = require('megadb');
 const { client } = require('../commands/commands_file');
 let levels_db = new db.crearDB('levels');
+let invites_db = new db.crearDB('invites');
+
+function promoteToWL(message) {
+    let WLRoleId = "937127841592651786";
+    let WLRole = message.guild.roles.cache.get(WLRoleId);
+    
+    if(haveAllInvites(message)){
+        userToAddRole = message.guild.members.cache.find(member => member.id === message.author.id)
+        userToAddRole.roles.add(WLRole);
+    }
+}
+
+function haveAllInvites(message) {
+    invites_db.find(`${message.guild.id}`, thisUser => thisUser.validInvites >= config.invitesToEnterWL)
+    .then(thisUser => {
+        if(thisUser != undefined) return true;
+        return false;
+    })
+}
 
 client.on("message", async (message) => {
 
@@ -16,10 +35,11 @@ client.on("message", async (message) => {
     if(message.content.startsWith(config.prefix)) return;
 
     if (!levels_db.tiene(message.guild.id)) levels_db.establecer(message.guild.id, {})
-    if (!levels_db.tiene(`${message.guild.id}.${message.author.id}`))  levels_db.establecer(`${message.guild.id}.${message.author.id}`, {xp: 0, nivel: 1})
+    if (!levels_db.tiene(`${message.guild.id}.${message.author.id}`))  levels_db.establecer(`${message.guild.id}.${message.author.id}`, {userId: message.author.id, xp: 0, nivel: 1})
       
     let { xp, nivel } = await levels_db.obtener(`${message.guild.id}.${message.author.id}`);
     let levelup = 5 * (nivel ** 2) + 50 * nivel + 100;
+    console.log(levelup);
     
     if (message.content.length <= 6){ 
         randomxp = 5;
@@ -38,7 +58,11 @@ client.on("message", async (message) => {
         .setColor("RANDOM")
         .setThumbnail(message.author.displayAvatarURL())
         .setDescription(`${message.member} acabas de subir de nivel: ${parseInt(nivel+1)}!`)
-        channelToSend.send({ embeds: [embed] })
+        channelToSend.send({ embeds: [embed] });
+
+        if (nivel+1 === 6) {
+            promoteToWL(message);
+        }
     }
     else{
         levels_db.sumar(`${message.guild.id}.${message.author.id}.xp`, randomxp);

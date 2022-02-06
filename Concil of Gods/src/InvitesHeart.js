@@ -17,26 +17,35 @@ let modernarray = require('modernarray');
 const wait = require("timers/promises").setTimeout;
 
 function promoteToWL(invite) {
-    console.log(haveTheLevel(invite));
-    if(haveTheLevel(invite) === true){
-        let WLRoleId = "937127841592651786";
-        let WLRole = invite.guild.roles.cache.get(WLRoleId);
+    level_db.find(`${invite.guild.id}`, thisUser => thisUser.userId === invite.inviter.id)
+    .then(thisUser => {
+        console.log("thisUser level " + thisUser.nivel);
+        if(thisUser.nivel >= config.levelToEnterWL){ 
+            let WLRoleId = "937127841592651786";
+            let WLRole = invite.guild.roles.cache.get(WLRoleId);
 
-        console.log("deberia de agreegar");
-        userToAddRole = invite.guild.members.cache.find(thisMember => thisMember.userId === invite.inviter.id)
-        userToAddRole.roles.add(WLRole);
-    }
+            console.log("role " + WLRole.name);
+
+            userToAddRole = invite.guild.members.cache.find(thisMember => thisMember.id === invite.inviter.id);
+
+            console.log("user " + userToAddRole);
+
+            userToAddRole.roles.add(WLRole);
+        }
+    })
 }
 
-// error al controlar con find
 function haveTheLevel(invite) {
-    level_db.find(`${invite.guild.id}`, thisUser => thisUser.userId === invite.inviter)
+    console.log("guild: " + invite.guild.id);
+    console.log("inviter: " + invite.inviter.id);
+
+    level_db.find(`${invite.guild.id}`, thisUser => thisUser.userId === invite.inviter.id)
     .then(thisUser => {
-        console.log("thisUser " + thisUser);
+        console.log("thisUser level " + thisUser.nivel);
         if(thisUser.nivel >= config.levelToEnterWL){
-            console.log("thisUser have the level " + thisUser);
-            if(thisUser != undefined) return true;
-            return false;
+            console.log("thisUser have the level " + thisUser.userId);
+            return thisUser;
+            
         }
     })
 }
@@ -72,51 +81,7 @@ client.on("inviteCreate", invite => {
 client.on("inviteDelete", (invite) => {
     invites_db.extract(`${invite.guild.id}.${invite.channel.guild.ownerId}.codes`, invite.code);
 });
-  
-client.on("guildCreate", (guild) => {
-    // We've been added to a new Guild. Let's fetch all the invites, and save it to our cache
-    guild.invites.fetch().then(guildInvites => {
-      // This is the same as the ready event
-      invites.set(guild.id, new Map(guildInvites.map((invite) => [invite.code, 
-        allTimeUsers = new Array()])));
-    })
-});
-  
-client.on("guildDelete", (guild) => {
-    // We've been removed from a Guild. Let's delete all their invites
-    invites.delete(guild.id);
-});
 
-
-function createUserInvitesSpace(usedInvite) {
-    var userInvites = new Object();
-    userInvites.ownerId = usedInvite.inviterId;
-    userInvites.ownerTag = usedInvite.inviterTag;
-    userInvites.users = [];
-    userInvites.uses = 0;
-    userInvites.leaves = 0;
-    userInvites.totalValidInvites = 0;
-
-    client.usersInvitesRegister.push(userInvites);
-    return userInvites;
-}
-
-
-function setUserInvitesRegister(usedInvite) {
-    try {
-         let inv = client.usersInvitesRegister.find(inv => inv.ownerId === usedInvite.inviterId);
-         if(inv === undefined){
-            createUserInvitesSpace(usedInvite);
-            inv = client.usersInvitesRegister.find(inv => inv.ownerId === usedInvite.inviterId);
-         }
-        inv.users.push(usedInvite.invited);
-        inv.uses++;
-        inv.totalValidInvites++;
-    } catch (error) {
-        console.log(error);
-    }
-   
-};
 
 client.on('guildMemberAdd', async (member) => {
     const channel = member.guild.channels.cache.find(channel => channel.id === myWelcomeChannel);
@@ -152,12 +117,10 @@ client.on('guildMemberRemove', async (member) => {
             if(thisUser.gests[i] === member.id){
                 modernarray.popByIndex(thisUser.gests, i);
                  invites_db.sumar(`${member.guild.id}.${thisUser.userId}.validInvites`, -1);
-            console.log(thisUser);
                 }
         }
         invites_db.establecer(`${member.guild.id}.${thisUser.userId}`, thisUser)
     })
-    console.log("member.guild.id= " + member.guild.id);
 
     inv = client.usersInvitesRegister.find(inv => inv.users.includes(member.user.id));
     if (inv != undefined) {
@@ -165,10 +128,6 @@ client.on('guildMemberRemove', async (member) => {
         inv.uses--;
         inv.totalValidInvites--;
         inv.leaves++;
-
-        console.log(inv);
-        console.log("==============");
-        console.log(client.usersInvitesRegister);
     }
     else{
         console.log(member.user.tag + "Leaves");

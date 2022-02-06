@@ -118,7 +118,7 @@ client.on("message", async message => {
                 .setThumbnail(message.author.displayAvatarURL())
                 .setTimestamp()
                 .addField("Nombre", message.author.username,  true)
-                .addField("XP", `${xp}`, true)
+                .addField("XP", `${xp}/${levelup}`, true)
                 .addField("Level", `${nivel}`, true)
                 .addField("Level", '```' + progressBar(levelPorcentage, 100, barSize) + '```');
                 message.reply({ embeds: [actualLevel] });

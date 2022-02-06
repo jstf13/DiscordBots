@@ -1,20 +1,11 @@
 var {client} = require("../commands/commands_file");
 const config = require('../config.json');
 const db = require('megadb');
-const { WelcomeChannel } = require("discord.js");
+
+let modernarray = require('modernarray');
 let invites_db = new db.crearDB('invites');
 let level_db = new db.crearDB('levels');
-
-// Initialize the invite cache
-const invites = new Map();
-let serverId = '926465898582253618';
-let TestServerId = '919766844385136650';
-let botMessageChannel = "new-people";
 let myWelcomeChannel = '927999666358980658';
-let modernarray = require('modernarray');
-
-// A pretty useful method to create a delay without blocking the whole script.
-const wait = require("timers/promises").setTimeout;
 
 function promoteToWL(invite) {
     level_db.find(`${invite.guild.id}`, thisUser => thisUser.userId === invite.inviter.id)
@@ -24,48 +15,11 @@ function promoteToWL(invite) {
             let WLRoleId = "937127841592651786";
             let WLRole = invite.guild.roles.cache.get(WLRoleId);
 
-            console.log("role " + WLRole.name);
-
             userToAddRole = invite.guild.members.cache.find(thisMember => thisMember.id === invite.inviter.id);
-
-            console.log("user " + userToAddRole);
-
             userToAddRole.roles.add(WLRole);
         }
     })
 }
-
-function haveTheLevel(invite) {
-    console.log("guild: " + invite.guild.id);
-    console.log("inviter: " + invite.inviter.id);
-
-    level_db.find(`${invite.guild.id}`, thisUser => thisUser.userId === invite.inviter.id)
-    .then(thisUser => {
-        console.log("thisUser level " + thisUser.nivel);
-        if(thisUser.nivel >= config.levelToEnterWL){
-            console.log("thisUser have the level " + thisUser.userId);
-            return thisUser;
-            
-        }
-    })
-}
-
-client.on("ready", async () => {
-  // "ready" isn't really ready. We need to wait a spell.
-  await wait(1000);
-
-  // Loop over all the guilds
-  client.guilds.cache.forEach(async (guild) => {
-    // Fetch all Guild Invites
-    const firstInvites = await guild.invites.fetch();
-    // Set the key as Guild ID, and create a map which has the invite code, and the number of uses
-   // inviteUsers.set(firstInvites.map((invite) => [invite.uses]), users);
-   if(guild.id == TestServerId)
-    allTimeUsers = new Array();
-    invites.set(guild.id, new Map(firstInvites.map((invite) => [invite.code, 
-        allTimeUsers = new Array()])));
-  });
-});
 
 client.on("inviteCreate", invite => {
     if (!invites_db.tiene(invite.guild.id)) invites_db.establecer(invite.guild.id, {})
@@ -97,7 +51,6 @@ client.on('guildMemberAdd', async (member) => {
                 invites_db.find(`${invite.guild.id}`, thisUser => thisUser.userId === invite.inviter.id)
                 .then(thisUser => { 
                     if (thisUser.validInvites >= config.invitesToEnterWL) {
-                        console.log("enough invitations. Inviter = " + invite.inviter)
                         promoteToWL(invite);
                     }
                     
@@ -110,7 +63,6 @@ client.on('guildMemberAdd', async (member) => {
 
 client.on('guildMemberRemove', async (member) => {
     userWhoInvite = 0;
-    let newUser;
     invites_db.find(`${member.guild.id}`, (thisUser) => thisUser.gests.includes(member.id))
     .then( thisUser =>{
         for (let i = 0; i <= thisUser.gests.length; i++) {
@@ -121,17 +73,7 @@ client.on('guildMemberRemove', async (member) => {
         }
         invites_db.establecer(`${member.guild.id}.${thisUser.userId}`, thisUser)
     })
-
-    inv = client.usersInvitesRegister.find(inv => inv.users.includes(member.user.id));
-    if (inv != undefined) {
-        inv.users = inv.users.filter((user) => user !== member.user.id);
-        inv.uses--;
-        inv.totalValidInvites--;
-        inv.leaves++;
-    }
-    else{
-        console.log(member.user.tag + "Leaves");
-    }
+     //   console.log(member.user.tag + "Leaves");
 });
 
 /*---Close Level zone ---*/

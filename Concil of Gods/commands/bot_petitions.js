@@ -233,13 +233,17 @@ client.on("message", async message => {
             case "progressbar":
                 message.channel.send(progressBar(99, 100, 10));
                 break;
-            
-            case "level":
-                message.channel.send("Nivel 1 Muchacho!");
-                break;
 
             case "help":
-                message.channel.send("COMANDOS\n- hola \n- adios \n- mejor video \n- embedTest");
+                const helpEmbed = new Discord.MessageEmbed() 
+                .setTitle("COMANDS")
+                .setColor(0x00AE86)
+                .setDescription(" !hola \n !adios \n !mejorvideo \n " +
+                " !invites \n  !level")
+                .setFooter("The gods only will answer these questions", client.user.avatarURL())
+                .setTimestamp()
+                message.reply({ embeds: [helpEmbed] });
+                message.author.react
                 break;
         };   
     }

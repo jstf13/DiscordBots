@@ -65,7 +65,7 @@ client.on('guildMemberRemove', async (member) => {
     userWhoInvite = 0;
     invites_db.find(`${member.guild.id}`, (thisUser) => thisUser.gests.includes(member.id))
     .then( thisUser =>{
-        for (let i = 0; i <= thisUser.gests.length; i++) {
+        for (let i = 0; i < thisUser.gests.length; i++) {
             if(thisUser.gests[i] === member.id){
                 modernarray.popByIndex(thisUser.gests, i);
                  invites_db.sumar(`${member.guild.id}.${thisUser.userId}.validInvites`, -1);

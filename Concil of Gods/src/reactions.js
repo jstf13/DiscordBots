@@ -1,6 +1,20 @@
+const { GuildInviteManager } = require("discord.js");
 var {client} = require("../commands/commands_file")
 
 client.on('messageReactionAdd', async (reaction, user) => {
+
+    guild = client.guilds.cache.get('926465898582253618');
+
+    console.log(guild.invites);
+    guild.invites.find(inv => {console.log(inv.code)});
+    guild.invites.fetch().then(inv =>
+        {inv.forEach((invi) => {
+            
+            console.log('INVITE: ', invi.code);
+            console.log('USES: ', invi.uses);
+        });})
+
+        //client.invites[invite.code]
 
     let lenguageMessage = 927573907760881665;
     let welcomeMessage = 926960221031636993;

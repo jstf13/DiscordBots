@@ -1,4 +1,5 @@
-var { client } = require("../commands/commands_file");
+var { client } = require("../commands/commands_file.js");
+const { GuildInviteManager } = require("discord.js");
 const config = require("../config.json");
 const db = require("megadb");
 
@@ -93,32 +94,75 @@ client.on("guildMemberAdd", async (member) => {
         }
       });
 
-      if (client.invites && invite.uses != client.invites[invite.code]) {
-        //if it doesn't match what we stored
-        channel.send(
-          `${member.user.tag} joined using invite code ${invite.code} from ${invite.inviter.tag}.`
-        );
+      // let invitation;
+      // client.fetchInvite("926465898582253618").then((inv) => {
+      //   console.log(inv);
+      // });
 
-        invites_db.push(
-          `${invite.guild.id}.${invite.inviter.id}.gests`,
-          member.user.id
-        );
-        invites_db.sumar(
-          `${invite.guild.id}.${invite.inviter.id}.validInvites`,
-          1
-        );
+      guild = client.guilds.cache.get("926465898582253618");
 
-        invites_db
-          .find(
-            `${invite.guild.id}`,
-            (thisUser) => thisUser.userId === invite.inviter.id
-          )
-          .then((thisUser) => {
-            if (thisUser.validInvites >= config.invitesToEnterWL) {
-              promoteToWL(invite);
-            }
-          });
-      }
+      guild.invites.fetch().then((inv) => {
+        console.log("hola");
+        inv.forEach((invi) => {
+          console.log("INVITE: ", invi.code);
+          console.log("USES: ", invi.uses);
+
+          if (invi.uses != invite.uses) {
+            console.log(invi);
+            console.log(
+              "server Invites -> " +
+                invite.uses +
+                " Client Invites -> " +
+                invi.uses
+            );
+
+            //if it doesn't match what we stored
+            channel.send(
+              `${member.user.tag} joined using invite code ${invite.code} from ${invite.inviter.tag}.`
+            );
+
+            invites_db.push(
+              `${invite.guild.id}.${invite.inviter.id}.gests`,
+              member.user.id
+            );
+            invites_db.sumar(
+              `${invite.guild.id}.${invite.inviter.id}.validInvites`,
+              1
+            );
+
+            invites_db
+              .find(
+                `${invite.guild.id}`,
+                (thisUser) => thisUser.userId === invite.inviter.id
+              )
+              .then((thisUser) => {
+                if (thisUser.validInvites >= config.invitesToEnterWL) {
+                  promoteToWL(invite);
+                }
+              });
+          }
+        });
+      });
+      //let clientInvie = undefined;
+      // console.log(guild.invites);
+
+      // guild.invites.fetch().then((inv) => {
+      //   inv.forEach((invi) => {
+      //     console.log('hola');
+      //console.log("inviCode: " + invi.code + " invite " + invite);
+
+      //   if (clientInvie == undefined && invi.code == invite) {
+      //     clientInvie = invi;
+      //     console.log("INVITE: ", invi.code);
+      //     console.log("USES: ", invi.uses);
+      //   }
+      //    });
+      // });
+      //console.log(clientInvie);
+
+      // if (invite.uses != clientInvie.uses) {
+
+      // }
     });
   });
   return undefined;

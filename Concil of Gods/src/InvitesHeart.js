@@ -10,6 +10,7 @@ let myWelcomeChannel = '927999666358980658';
 function promoteToWL(invite) {
     level_db.find(`${invite.guild.id}`, thisUser => thisUser.userId === invite.inviter.id)
     .then(thisUser => {
+        if (thisUser){
         console.log("thisUser level " + thisUser.nivel);
         if(thisUser.nivel >= config.levelToEnterWL){ 
             let WLRoleId = "937127841592651786";
@@ -17,8 +18,9 @@ function promoteToWL(invite) {
 
             userToAddRole = invite.guild.members.cache.find(thisMember => thisMember.id === invite.inviter.id);
             userToAddRole.roles.add(WLRole);
-        }
+        }}
     })
+
 }
 
 client.on("inviteCreate", invite => {
@@ -38,10 +40,17 @@ client.on("inviteDelete", (invite) => {
 
 
 client.on('guildMemberAdd', async (member) => {
+
+
     const channel = member.guild.channels.cache.find(channel => channel.id === myWelcomeChannel);
 
     member.guild.invites.fetch().then(guildInvites => { //get all guild invites
+        
         guildInvites.each(invite => { //basically a for loop over the invites:
+            if (!invites_db.tiene(`${invite.guild.id}.${invite.inviterId}`)) {
+                invites_db.establecer(`${invite.guild.id}.${invite.inviterId}`,
+                 {user: invite.inviter.username, userId: invite.inviter.id, gests: [], validInvites: 0, codes: [invite.code]}) 
+            }
             if(invite.uses != client.invites[invite.code]) { //if it doesn't match what we stored
                 channel.send(`${member.user.tag} joined using invite code ${invite.code} from ${invite.inviter.tag}.`)
                 
@@ -62,10 +71,11 @@ client.on('guildMemberAdd', async (member) => {
 });
 
 client.on('guildMemberRemove', async (member) => {
+    console.log("Leaves");
     userWhoInvite = 0;
     invites_db.find(`${member.guild.id}`, (thisUser) => thisUser.gests.includes(member.id))
     .then( thisUser =>{
-        for (let i = 0; i <= thisUser.gests.length; i++) {
+        for (let i = 0; i < thisUser.gests.length; i++) {
             if(thisUser.gests[i] === member.id){
                 modernarray.popByIndex(thisUser.gests, i);
                  invites_db.sumar(`${member.guild.id}.${thisUser.userId}.validInvites`, -1);

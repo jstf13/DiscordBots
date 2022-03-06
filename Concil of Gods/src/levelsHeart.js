@@ -10,6 +10,7 @@ let invites_db = new db.crearDB('invites');
 function promoteToWL(message) {
     invites_db.find(`${message.guild.id}`, thisUser => thisUser.userId === message.author.id)
     .then(thisUser => {
+        if(thisUser){
         console.log("thisUser level " + thisUser.validInvites);
         if(thisUser.validInvites >= config.invitesToEnterWL){ 
             let WLRoleId = "937127841592651786";
@@ -17,7 +18,7 @@ function promoteToWL(message) {
 
             userToAddRole = message.guild.members.cache.find(thisMember => thisMember.id === message.author.id);
             userToAddRole.roles.add(WLRole);
-        }
+        }}
     })
 }
 

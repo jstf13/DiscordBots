@@ -1,5 +1,4 @@
 var { client } = require("../commands/commands_file.js");
-const { GuildInviteManager } = require("discord.js");
 const config = require("../config.json");
 const db = require("megadb");
 
@@ -40,23 +39,74 @@ client.on("inviteCreate", (invite) => {
       gests: [],
       validInvites: 0,
       codes: [invite.code],
+      complete_codes: {
+        [invite.code]: {
+          uses: 0,
+        },
+      },
     });
   } else {
     invites_db.push(
       `${invite.guild.id}.${invite.inviter.id}.codes`,
       invite.code
     );
+    invites_db.establecer(
+      `${invite.guild.id}.${invite.inviter.id}.complete_codes.${invite.code}.uses`,
+      0
+    );
   }
 });
 
 client.on("inviteDelete", (invite) => {
-  invites_db.extract(
-    `${invite.guild.id}.${invite.channel.guild.ownerId}.codes`,
-    invite.code
-  );
+  if (
+    invites_db.tiene(`${invite.guild.id}.${invite.channel.guild.ownerId}.codes`)
+  ) {
+    invites_db.extract(
+      `${invite.guild.id}.${invite.channel.guild.ownerId}.codes`,
+      invite.code
+    );
+    invites_db.eliminar(
+      `${invite.guild.id}.${invite.channel.guild.ownerId}.complete_codes.${invite.code}`
+    );
+  }
+
+  invite.guild.invites.fetch().then((guildInvites) => {
+    //get all guild invites
+
+    let actualInvites = invites_db.obtener(
+      `${invite.guild.id}.${invite.channel.guild.ownerId}.codes`
+    );
+
+    actualInvites.then(function (result) {
+      result.forEach((element) => {
+        let isInside = false;
+
+        guildInvites.each((guiInvite) => {
+          if (guiInvite.code == element) {
+            isInside = true;
+          }
+        });
+
+        if (isInside == false) {
+          invites_db.eliminar(
+            `${invite.guild.id}.${invite.channel.guild.ownerId}.complete_codes.${element}`
+          );
+          invites_db.extract(
+            `${invite.guild.id}.${invite.channel.guild.ownerId}.codes`,
+            element
+          );
+          inviteToRemove = undefined;
+        }
+      });
+    });
+  });
 });
 
 client.on("guildMemberAdd", async (member) => {
+  let isThisInvite = false;
+  let isInTheList = false;
+  let endTheTask = false;
+
   const channel = member.guild.channels.cache.find(
     (channel) => channel.id === myWelcomeChannel
   );
@@ -73,6 +123,11 @@ client.on("guildMemberAdd", async (member) => {
           gests: [],
           validInvites: 0,
           codes: [invite.code],
+          complete_codes: {
+            [invite.code]: {
+              uses: 0,
+            },
+          },
         });
       }
 
@@ -80,7 +135,6 @@ client.on("guildMemberAdd", async (member) => {
         `${invite.guild.id}.${invite.inviter.id}.codes`
       );
 
-      let isInTheList = false;
       codes.then(function (result) {
         res = result;
         for (let i = 0; i < res.length && isInTheList == false; i++) {
@@ -91,82 +145,89 @@ client.on("guildMemberAdd", async (member) => {
             `${invite.guild.id}.${invite.inviter.id}.codes`,
             invite.code
           );
+          invites_db.establecer(
+            `${invite.guild.id}.${invite.inviter.id}.complete_codes.${invite.code}.uses`,
+            invite.uses
+          );
         }
       });
-
-      // let invitation;
-      // client.fetchInvite("926465898582253618").then((inv) => {
-      //   console.log(inv);
-      // });
 
       guild = client.guilds.cache.get("926465898582253618");
 
       guild.invites.fetch().then((inv) => {
-        console.log("hola");
         inv.forEach((invi) => {
-          console.log("INVITE: ", invi.code);
-          console.log("USES: ", invi.uses);
+          uses = invites_db.obtener(
+            `${invite.guild.id}.${invite.inviter.id}.complete_codes.${invite.code}`
+          );
 
-          if (invi.uses != invite.uses) {
-            console.log(invi);
-            console.log(
-              "server Invites -> " +
-                invite.uses +
-                " Client Invites -> " +
-                invi.uses
-            );
+          uses.then(function (result) {
+            if (result.uses + 1 == invite.uses) {
+              console.log(result.uses + 1 + "==" + invite.uses);
+              console.log("entre");
+              isThisInvite = true;
+              newUser(member, invite, channel);
+              return;
+            }
+            if (result.uses + 1 < invite.uses) {
+              invites_db.establecer(
+                `${invite.guild.id}.${invite.inviter.id}.complete_codes.${invite.code}.uses`,
+                invite.uses
+              );
+              isThisInvite = true;
+              newUser(member, invite, channel);
+              return;
+            }
+          });
 
-            //if it doesn't match what we stored
-            channel.send(
-              `${member.user.tag} joined using invite code ${invite.code} from ${invite.inviter.tag}.`
-            );
-
-            invites_db.push(
-              `${invite.guild.id}.${invite.inviter.id}.gests`,
-              member.user.id
-            );
-            invites_db.sumar(
-              `${invite.guild.id}.${invite.inviter.id}.validInvites`,
-              1
-            );
-
-            invites_db
-              .find(
-                `${invite.guild.id}`,
-                (thisUser) => thisUser.userId === invite.inviter.id
-              )
-              .then((thisUser) => {
-                if (thisUser.validInvites >= config.invitesToEnterWL) {
-                  promoteToWL(invite);
-                }
-              });
-          }
+          console.log(isThisInvite + " " + invite.code);
+          if (isThisInvite == true) return;
         });
       });
-      //let clientInvie = undefined;
-      // console.log(guild.invites);
-
-      // guild.invites.fetch().then((inv) => {
-      //   inv.forEach((invi) => {
-      //     console.log('hola');
-      //console.log("inviCode: " + invi.code + " invite " + invite);
-
-      //   if (clientInvie == undefined && invi.code == invite) {
-      //     clientInvie = invi;
-      //     console.log("INVITE: ", invi.code);
-      //     console.log("USES: ", invi.uses);
-      //   }
-      //    });
-      // });
-      //console.log(clientInvie);
-
-      // if (invite.uses != clientInvie.uses) {
-
-      // }
     });
   });
   return undefined;
 });
+
+function newUser(member, invite, channel) {
+  //if (endTheTask == false) {
+  //if it doesn't match what we stored
+  channel.send(
+    `${member.user.tag} joined using invite code ${invite.code} from ${invite.inviter.tag}.`
+  );
+  let guests = invites_db.obtener(
+    `${invite.guild.id}.${invite.inviter.id}.gests`
+  );
+  let includesUserInGests = false;
+  guests.then(function (result) {
+    includesUserInGests = result.includes(member.user.id);
+  });
+  if (includesUserInGests) {
+    invites_db.push(
+      `${invite.guild.id}.${invite.inviter.id}.gests`,
+      member.user.id
+    );
+    invites_db.sumar(`${invite.guild.id}.${invite.inviter.id}.validInvites`, 1);
+    invites_db.sumar(
+      `${invite.guild.id}.${invite.inviter.id}.complete_codes.${invite.code}.uses`,
+      1
+    );
+
+    invites_db
+      .find(
+        `${invite.guild.id}`,
+        (thisUser) => thisUser.userId === invite.inviter.id
+      )
+      .then((thisUser) => {
+        if (thisUser.validInvites >= config.invitesToEnterWL) {
+          promoteToWL(invite);
+        }
+      });
+  }
+
+  // isThisInvite = false;
+  //endTheTask = true;
+  // }
+}
 
 client.on("guildMemberRemove", async (member) => {
   console.log("Leaves");

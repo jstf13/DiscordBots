@@ -1,25 +1,30 @@
 {
   "926465898582253618": {
-    "785828317608804403": {
-      "user": "pia",
-      "userId": "785828317608804403",
-      "gests": [],
-      "validInvites": 0,
-      "codes": [
-        "BFwCJH8z"
-      ]
-    },
     "426072100265000961": {
       "user": "jstf13",
       "userId": "426072100265000961",
-      "gests": [
-        "785828317608804403",
-        "785828317608804403"
-      ],
-      "validInvites": 2,
+      "gests": [],
+      "validInvites": 0,
       "codes": [
-        "KCAhNNB8"
-      ]
+        "B6NYMC4q",
+        "xUznSxhQ",
+        "GpnUzNRc",
+        "u5sWPKTf"
+      ],
+      "complete_codes": {
+        "u5sWPKTf": {
+          "uses": 0
+        },
+        "GpnUzNRc": {
+          "uses": 0
+        },
+        "xUznSxhQ": {
+          "uses": 0
+        },
+        "B6NYMC4q": {
+          "uses": 0
+        }
+      }
     }
   }
 }

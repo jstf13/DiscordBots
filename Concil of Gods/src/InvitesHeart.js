@@ -103,9 +103,7 @@ client.on("inviteDelete", (invite) => {
 });
 
 client.on("guildMemberAdd", async (member) => {
-  let isThisInvite = false;
   let isInTheList = false;
-  let endTheTask = false;
 
   const channel = member.guild.channels.cache.find(
     (channel) => channel.id === myWelcomeChannel
@@ -157,30 +155,25 @@ client.on("guildMemberAdd", async (member) => {
       guild.invites.fetch().then((inv) => {
         inv.forEach((invi) => {
           uses = invites_db.obtener(
-            `${invite.guild.id}.${invite.inviter.id}.complete_codes.${invite.code}`
+            `${invi.guild.id}.${invi.inviter.id}.complete_codes.${invi.code}`
           );
 
-          uses.then(function (result) {
-            if (result.uses + 1 == invite.uses) {
-              console.log(result.uses + 1 + "==" + invite.uses);
-              console.log("entre");
-              isThisInvite = true;
-              newUser(member, invite, channel);
-              return;
-            }
-            if (result.uses + 1 < invite.uses) {
-              invites_db.establecer(
-                `${invite.guild.id}.${invite.inviter.id}.complete_codes.${invite.code}.uses`,
-                invite.uses
-              );
-              isThisInvite = true;
-              newUser(member, invite, channel);
-              return;
-            }
-          });
-
-          console.log(isThisInvite + " " + invite.code);
-          if (isThisInvite == true) return;
+          uses
+            .then(function (result) {
+              return new Promise((resolve) => {
+                if (result.uses + 1 == invi.uses) {
+                  resolve(invi);
+                }
+                if (result.uses + 1 < invi.uses) {
+                  invites_db.establecer(
+                    `${invi.guild.id}.${invi.inviter.id}.complete_codes.${invi.code}.uses`,
+                    invi.uses - 1
+                  );
+                  resolve(invi);
+                }
+              });
+            })
+            .then((data) => newUser(member, data, channel));
         });
       });
     });
@@ -188,49 +181,49 @@ client.on("guildMemberAdd", async (member) => {
   return undefined;
 });
 
-function newUser(member, invite, channel) {
-  //if (endTheTask == false) {
-  //if it doesn't match what we stored
+async function newUser(member, invite, channel) {
   channel.send(
     `${member.user.tag} joined using invite code ${invite.code} from ${invite.inviter.tag}.`
   );
   let guests = invites_db.obtener(
     `${invite.guild.id}.${invite.inviter.id}.gests`
   );
-  let includesUserInGests = false;
-  guests.then(function (result) {
-    includesUserInGests = result.includes(member.user.id);
-  });
-  if (includesUserInGests) {
-    invites_db.push(
-      `${invite.guild.id}.${invite.inviter.id}.gests`,
-      member.user.id
-    );
-    invites_db.sumar(`${invite.guild.id}.${invite.inviter.id}.validInvites`, 1);
-    invites_db.sumar(
-      `${invite.guild.id}.${invite.inviter.id}.complete_codes.${invite.code}.uses`,
-      1
-    );
-
-    invites_db
-      .find(
-        `${invite.guild.id}`,
-        (thisUser) => thisUser.userId === invite.inviter.id
-      )
-      .then((thisUser) => {
-        if (thisUser.validInvites >= config.invitesToEnterWL) {
-          promoteToWL(invite);
-        }
+  guests
+    .then(function (result) {
+      return new Promise((resolve) => {
+        resolve(result.includes(member.user.id));
       });
-  }
+    })
+    .then((includesUserInGests) => {
+      if (includesUserInGests == false) {
+        invites_db.push(
+          `${invite.guild.id}.${invite.inviter.id}.gests`,
+          member.user.id
+        );
+        invites_db.sumar(
+          `${invite.guild.id}.${invite.inviter.id}.validInvites`,
+          1
+        );
+        invites_db.sumar(
+          `${invite.guild.id}.${invite.inviter.id}.complete_codes.${invite.code}.uses`,
+          1
+        );
 
-  // isThisInvite = false;
-  //endTheTask = true;
-  // }
+        invites_db
+          .find(
+            `${invite.guild.id}`,
+            (thisUser) => thisUser.userId === invite.inviter.id
+          )
+          .then((thisUser) => {
+            if (thisUser.validInvites >= config.invitesToEnterWL) {
+              promoteToWL(invite);
+            }
+          });
+      }
+    });
 }
 
 client.on("guildMemberRemove", async (member) => {
-  console.log("Leaves");
   userWhoInvite = 0;
   invites_db
     .find(`${member.guild.id}`, (thisUser) =>

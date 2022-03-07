@@ -3,19 +3,6 @@ var {client} = require("../commands/commands_file")
 
 client.on('messageReactionAdd', async (reaction, user) => {
 
-    guild = client.guilds.cache.get('926465898582253618');
-
-    console.log(guild.invites);
-    guild.invites.find(inv => {console.log(inv.code)});
-    guild.invites.fetch().then(inv =>
-        {inv.forEach((invi) => {
-            
-            console.log('INVITE: ', invi.code);
-            console.log('USES: ', invi.uses);
-        });})
-
-        //client.invites[invite.code]
-
     let lenguageMessage = 927573907760881665;
     let welcomeMessage = 926960221031636993;
 
@@ -49,7 +36,6 @@ client.on('messageReactionAdd', async (reaction, user) => {
         
         if (reaction.emoji.name === '🇪🇸') {
             let commonRole = reaction.message.guild.roles.cache.get("927215843274813510");
-            console.log(commonRole.name);
             try {
                 reactedUser.roles.add(commonRole);
              } catch {
@@ -59,7 +45,6 @@ client.on('messageReactionAdd', async (reaction, user) => {
         
         if (reaction.emoji.name === '🇬🇧') {
             let commonRole = reaction.message.guild.roles.cache.get("927224462850523156");    
-                    console.log(commonRole.name);
             try {
                 reactedUser.roles.add(commonRole);
              } catch {
@@ -67,12 +52,6 @@ client.on('messageReactionAdd', async (reaction, user) => {
              }
         }
     }
-
-
-	// Now the message has been cached and is fully available
-	console.log(`${reaction.message.author}'s message "${reaction.message.id}" gained a reaction!`);
-	// The reaction is now also fully available and the properties will be reflected accurately:
-	console.log(`${reaction.count} user(s) have given the same reaction to this message!`);
 });
 
 client.on('messageReactionRemove', (reaction, user) => {
@@ -80,9 +59,7 @@ client.on('messageReactionRemove', (reaction, user) => {
     let lenguageMessage = 927573907760881665;
     let welcomeMessage = 926960221031636993;
 
-    console.log('Reaction removed; current count:', reaction.count);
     if (reaction.message.id == 926960221031636993 && reaction.emoji.name === '✅') {
-        console.log("segunda");
         let commonRole = reaction.message.guild.roles.cache.get("926470689249189918");
         let reactedUser =  reaction.message.guild.members.cache.find(member => member.id === user.id)
         try {
@@ -97,7 +74,6 @@ client.on('messageReactionRemove', (reaction, user) => {
         
         if (reaction.emoji.name === '🇪🇸') {
             let commonRole = reaction.message.guild.roles.cache.get("927215843274813510");
-            console.log(commonRole.name);
             try {
                 reactedUser.roles.remove(commonRole);
              } catch {
@@ -106,8 +82,7 @@ client.on('messageReactionRemove', (reaction, user) => {
         }
         
         if (reaction.emoji.name === '🇬🇧') {
-            let commonRole = reaction.message.guild.roles.cache.get("927224462850523156");    
-                    console.log(commonRole.name);
+            let commonRole = reaction.message.guild.roles.cache.get("927224462850523156");   
             try {
                 reactedUser.roles.remove(commonRole);
              } catch {

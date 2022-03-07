@@ -30,76 +30,82 @@ function promoteToWL(invite) {
 }
 
 client.on("inviteCreate", (invite) => {
-  if (!invites_db.tiene(invite.guild.id))
-    invites_db.establecer(invite.guild.id, {});
-  if (!invites_db.tiene(`${invite.guild.id}.${invite.inviterId}`)) {
-    invites_db.establecer(`${invite.guild.id}.${invite.inviterId}`, {
-      user: invite.inviter.username,
-      userId: invite.inviter.id,
-      gests: [],
-      validInvites: 0,
-      codes: [invite.code],
-      complete_codes: {
-        [invite.code]: {
-          uses: 0,
+  if (!isAIgnoredId(member)) {
+    if (!invites_db.tiene(invite.guild.id))
+      invites_db.establecer(invite.guild.id, {});
+    if (!invites_db.tiene(`${invite.guild.id}.${invite.inviterId}`)) {
+      invites_db.establecer(`${invite.guild.id}.${invite.inviterId}`, {
+        user: invite.inviter.username,
+        userId: invite.inviter.id,
+        gests: [],
+        validInvites: 0,
+        codes: [invite.code],
+        complete_codes: {
+          [invite.code]: {
+            uses: 0,
+          },
         },
-      },
-    });
-  } else {
-    invites_db.push(
-      `${invite.guild.id}.${invite.inviter.id}.codes`,
-      invite.code
-    );
-    invites_db.establecer(
-      `${invite.guild.id}.${invite.inviter.id}.complete_codes.${invite.code}.uses`,
-      0
-    );
+      });
+    } else {
+      invites_db.push(
+        `${invite.guild.id}.${invite.inviter.id}.codes`,
+        invite.code
+      );
+      invites_db.establecer(
+        `${invite.guild.id}.${invite.inviter.id}.complete_codes.${invite.code}.uses`,
+        0
+      );
+    }
   }
 });
 
 client.on("inviteDelete", (invite) => {
-  if (
-    invites_db.tiene(`${invite.guild.id}.${invite.channel.guild.ownerId}.codes`)
-  ) {
-    invites_db.extract(
-      `${invite.guild.id}.${invite.channel.guild.ownerId}.codes`,
-      invite.code
-    );
-    invites_db.eliminar(
-      `${invite.guild.id}.${invite.channel.guild.ownerId}.complete_codes.${invite.code}`
-    );
-  }
+  if (!isAIgnoredId(member)) {
+    if (
+      invites_db.tiene(
+        `${invite.guild.id}.${invite.channel.guild.ownerId}.codes`
+      )
+    ) {
+      invites_db.extract(
+        `${invite.guild.id}.${invite.channel.guild.ownerId}.codes`,
+        invite.code
+      );
+      invites_db.eliminar(
+        `${invite.guild.id}.${invite.channel.guild.ownerId}.complete_codes.${invite.code}`
+      );
+    }
 
-  invite.guild.invites.fetch().then((guildInvites) => {
-    //get all guild invites
+    invite.guild.invites.fetch().then((guildInvites) => {
+      //get all guild invites
 
-    let actualInvites = invites_db.obtener(
-      `${invite.guild.id}.${invite.channel.guild.ownerId}.codes`
-    );
+      let actualInvites = invites_db.obtener(
+        `${invite.guild.id}.${invite.channel.guild.ownerId}.codes`
+      );
 
-    actualInvites.then(function (result) {
-      result.forEach((element) => {
-        let isInside = false;
+      actualInvites.then(function (result) {
+        result.forEach((element) => {
+          let isInside = false;
 
-        guildInvites.each((guiInvite) => {
-          if (guiInvite.code == element) {
-            isInside = true;
+          guildInvites.each((guiInvite) => {
+            if (guiInvite.code == element) {
+              isInside = true;
+            }
+          });
+
+          if (isInside == false) {
+            invites_db.eliminar(
+              `${invite.guild.id}.${invite.channel.guild.ownerId}.complete_codes.${element}`
+            );
+            invites_db.extract(
+              `${invite.guild.id}.${invite.channel.guild.ownerId}.codes`,
+              element
+            );
+            inviteToRemove = undefined;
           }
         });
-
-        if (isInside == false) {
-          invites_db.eliminar(
-            `${invite.guild.id}.${invite.channel.guild.ownerId}.complete_codes.${element}`
-          );
-          invites_db.extract(
-            `${invite.guild.id}.${invite.channel.guild.ownerId}.codes`,
-            element
-          );
-          inviteToRemove = undefined;
-        }
       });
     });
-  });
+  }
 });
 
 client.on("guildMemberAdd", async (member) => {
@@ -150,32 +156,34 @@ client.on("guildMemberAdd", async (member) => {
         }
       });
 
-      guild = client.guilds.cache.get("926465898582253618");
+      if (!isAIgnoredId(member)) {
+        guild = client.guilds.cache.get("926465898582253618");
 
-      guild.invites.fetch().then((inv) => {
-        inv.forEach((invi) => {
-          uses = invites_db.obtener(
-            `${invi.guild.id}.${invi.inviter.id}.complete_codes.${invi.code}`
-          );
+        guild.invites.fetch().then((inv) => {
+          inv.forEach((invi) => {
+            uses = invites_db.obtener(
+              `${invi.guild.id}.${invi.inviter.id}.complete_codes.${invi.code}`
+            );
 
-          uses
-            .then(function (result) {
-              return new Promise((resolve) => {
-                if (result.uses + 1 == invi.uses) {
-                  resolve(invi);
-                }
-                if (result.uses + 1 < invi.uses) {
-                  invites_db.establecer(
-                    `${invi.guild.id}.${invi.inviter.id}.complete_codes.${invi.code}.uses`,
-                    invi.uses - 1
-                  );
-                  resolve(invi);
-                }
-              });
-            })
-            .then((data) => newUser(member, data, channel));
+            uses
+              .then(function (result) {
+                return new Promise((resolve) => {
+                  if (result.uses + 1 == invi.uses) {
+                    resolve(invi);
+                  }
+                  if (result.uses + 1 < invi.uses) {
+                    invites_db.establecer(
+                      `${invi.guild.id}.${invi.inviter.id}.complete_codes.${invi.code}.uses`,
+                      invi.uses - 1
+                    );
+                    resolve(invi);
+                  }
+                });
+              })
+              .then((data) => newUser(member, data, channel));
+          });
         });
-      });
+      }
     });
   });
   return undefined;
@@ -224,29 +232,41 @@ async function newUser(member, invite, channel) {
 }
 
 client.on("guildMemberRemove", async (member) => {
-  userWhoInvite = 0;
-  invites_db
-    .find(`${member.guild.id}`, (thisUser) =>
-      thisUser.gests.includes(member.id)
-    )
-    .then((thisUser) => {
-      if (thisUser) {
-        for (let i = 0; i < thisUser.gests.length; i++) {
-          if (thisUser.gests[i] === member.id) {
-            modernarray.popByIndex(thisUser.gests, i);
-            invites_db.sumar(
-              `${member.guild.id}.${thisUser.userId}.validInvites`,
-              -1
-            );
+  if (!isAIgnoredId(member)) {
+    userWhoInvite = 0;
+    invites_db
+      .find(`${member.guild.id}`, (thisUser) =>
+        thisUser.gests.includes(member.id)
+      )
+      .then((thisUser) => {
+        if (thisUser) {
+          for (let i = 0; i < thisUser.gests.length; i++) {
+            if (thisUser.gests[i] === member.id) {
+              modernarray.popByIndex(thisUser.gests, i);
+              invites_db.sumar(
+                `${member.guild.id}.${thisUser.userId}.validInvites`,
+                -1
+              );
+            }
           }
+          invites_db.establecer(
+            `${member.guild.id}.${thisUser.userId}`,
+            thisUser
+          );
         }
-        invites_db.establecer(
-          `${member.guild.id}.${thisUser.userId}`,
-          thisUser
-        );
-      }
-    });
-  //   console.log(member.user.tag + "Leaves");
+      });
+  }
 });
+
+function isAIgnoredId(member) {
+  for (let i = 0; i < config.ignoredIds.length; i++) {
+    if (config.ignoredIds.includes(member.user.id)) {
+      console.log("is ignored");
+      return true;
+    }
+  }
+  console.log("not is ignored");
+  return false;
+}
 
 /*---Close Level zone ---*/

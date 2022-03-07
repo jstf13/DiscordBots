@@ -3,8 +3,10 @@
     "426072100265000961": {
       "user": "jstf13",
       "userId": "426072100265000961",
-      "gests": [],
-      "validInvites": 0,
+      "gests": [
+        "785828317608804403"
+      ],
+      "validInvites": 1,
       "codes": [
         "hTHCFmqq",
         "B6NYMC4q",
@@ -26,17 +28,15 @@
           "uses": 6
         },
         "hTHCFmqq": {
-          "uses": 22
+          "uses": 28
         }
       }
     },
     "785828317608804403": {
       "user": "pia",
       "userId": "785828317608804403",
-      "gests": [
-        "785828317608804403"
-      ],
-      "validInvites": 1,
+      "gests": [],
+      "validInvites": 0,
       "codes": [
         "DcM2e7rf"
       ],

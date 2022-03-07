@@ -57,7 +57,7 @@ client.on("message", async message => {
                 .setColor(0x00AE86)
                 
                 .addField("-------------------- \n ✅ Total valid invites -> " + valInvites, "--------------------")
-                .addField("❌ leaves -> " + leavInvites, "--------------------")
+                // .addField("❌ leaves -> " + leavInvites, "--------------------")
                 .setThumbnail(message.author.displayAvatarURL())
                 .setFooter("Message from the concil", client.user.avatarURL())
                 message.channel.send({ embeds: [embedDatosInv] });
@@ -238,7 +238,7 @@ client.on("message", async message => {
                 const helpEmbed = new Discord.MessageEmbed() 
                 .setTitle("COMANDS")
                 .setColor(0x00AE86)
-                .setDescription(" !hola \n !adios \n !mejorvideo \n " +
+                .setDescription(" !hola \n !adios \n " +
                 " !invites \n  !level")
                 .setFooter("The gods only will answer these questions", client.user.avatarURL())
                 .setTimestamp()

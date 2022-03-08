@@ -27,8 +27,11 @@ function promoteToWL(message) {
             (thisMember) => thisMember.id === message.author.id
           );
           userToAddRole.roles.add(WLRole);
-          promotedToWLMessage(message);
-          addUserToWLDataBase(userToAddRole);
+          addUserToWLDataBase(userToAddRole).then((wasAdded) => {
+            if (wasAdded) {
+              promotedToWLMessage(message);
+            }
+          });
         }
       }
     });
@@ -132,13 +135,20 @@ async function getLevelOfWL(message) {
 }
 
 function addUserToWLDataBase(userToAdd) {
-  if (!wl_db.tiene(userToAdd.guild.id))
-    wl_db.establecer(userToAdd.guild.id, {});
-  if (!wl_db.tiene(`${userToAdd.guild.id}.${userToAdd.id}`)) {
-    console.log('entro a agregar a wl');
-    wl_db.establecer(`${userToAdd.guild.id}.${userToAdd.id}`, {
-      name: userToAdd.user.username,
-      userId: userToAdd.id,
-    });
-  }
+  return new Promise((resolve) => {
+    let wasAdded = false;
+    if (!wl_db.tiene(userToAdd.guild.id))
+      wl_db.establecer(userToAdd.guild.id, {
+        wl_members: 0,
+      });
+    if (!wl_db.tiene(`${userToAdd.guild.id}.${userToAdd.id}`)) {
+      wl_db.establecer(`${userToAdd.guild.id}.${userToAdd.id}`, {
+        name: userToAdd.user.username,
+        userId: userToAdd.id,
+      });
+      wl_db.sumar(`${userToAdd.guild.id}.wl_members`, 1);
+      wasAdded = true;
+    }
+    resolve(wasAdded);
+  });
 }

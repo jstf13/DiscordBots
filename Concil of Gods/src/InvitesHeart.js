@@ -280,9 +280,9 @@ async function newUser(member, invite, channel) {
           })
           .then((thisUser) => {
             getLevelOfWL(member).then((levelOfWL) => {
-                  if (userToPromoteWL.validInvites >= levelOfWL) {
-                    promoteToWL(invite);
-                  }
+              if (userToPromoteWL.validInvites >= levelOfWL) {
+                promoteToWL(invite);
+              }
             });
           });
       }
@@ -328,13 +328,14 @@ function promotedToWLMessage(invite) {
   channelToSend.send({ embeds: [embed] });
 }
 
-
-
 function addUserToWLDataBase(userToAdd) {
-  if (!wl_db.tiene(userToAdd.guild.id))
-    wl_db.establecer(userToAdd.guild.id, {});
+  if (!wl_db.tiene(userToAdd.guild.id)) {
+    wl_db.establecer(userToAdd.guild.id, {
+      wl_members: 0,
+    });
+  }
   if (!wl_db.tiene(`${userToAdd.guild.id}.${userToAdd.id}`)) {
-    console.log('entro a agregar a wl');
+    console.log("entro a agregar a wl");
     wl_db.establecer(`${userToAdd.guild.id}.${userToAdd.id}`, {
       name: userToAdd.user.username,
       userId: userToAdd.id,

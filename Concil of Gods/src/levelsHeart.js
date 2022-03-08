@@ -6,6 +6,9 @@ const db = require("megadb");
 const { client } = require("../commands/commands_file");
 let levels_db = new db.crearDB("levels");
 let invites_db = new db.crearDB("invites");
+let wl_db = new db.crearDB("wl_People");
+let levelChannel = "938964691244441611";
+let WLRoleId = "937127841592651786";
 
 function promoteToWL(message) {
   let userToPromote;
@@ -18,18 +21,31 @@ function promoteToWL(message) {
     .then((thisUser) => {
       if (userToPromote) {
         if (userToPromote.validInvites >= config.invitesToEnterWL) {
-          let WLRoleId = "937127841592651786";
           let WLRole = message.guild.roles.cache.get(WLRoleId);
 
           userToAddRole = message.guild.members.cache.find(
             (thisMember) => thisMember.id === message.author.id
           );
           userToAddRole.roles.add(WLRole);
-          console.log("cambio maximo");
+          promotedToWLMessage(message);
+          addUserToWLDataBase(userToAddRole);
         }
       }
     });
 }
+
+function promotedToWLMessage(message) {
+  const channelToSend = message.guild.channels.cache.find(
+    (channel) => channel.id === levelChannel
+  );
+  const embed = new Discord.MessageEmbed()
+    .setColor("YELLOW")
+    .setDescription(
+      `${message.member} congratulations you just earned a place in the White List!`
+    );
+  channelToSend.send({ embeds: [embed] });
+}
+
 client.on("message", async (message) => {
   let randomxp = 0;
 
@@ -65,7 +81,7 @@ client.on("message", async (message) => {
     );
 
     levels_db.establecer(`${message.guild.id}.${message.author.id}`, {
-      serId: message.author.id,
+      userId: message.author.id,
       xp: 0,
       nivel: parseInt(nivel + 1),
     });
@@ -91,27 +107,38 @@ client.on("message", async (message) => {
 });
 
 async function getLevelOfWL(message) {
-    return new Promise((resolve) => {
-      let idMembers = message.guild.roles.cache
-        .get("937127841592651786")
-        .members.map((m) => m.user.tag);
-      console.log(idMembers);
-      let amounOfWlPeople = idMembers.length;
-      if (amounOfWlPeople <= 150) {
-        resolve(config.levels.level_1.level);
-      }
-      if (amounOfWlPeople <= 500) {
-        resolve(config.levels.level_2.level);
-      }
-      if (amounOfWlPeople <= 950) {
-        resolve(config.levels.level_3.level);
-      }
-      if (amounOfWlPeople <= 1400) {
-        resolve(config.levels.level_4.level);
-      }
-      if (amounOfWlPeople <= 1750) {
-        resolve(config.levels.level_5.level);
-      }
+  return new Promise((resolve) => {
+    let idMembers = message.guild.roles.cache
+      .get("937127841592651786")
+      .members.map((m) => m.user.tag);
+    console.log(idMembers);
+    let amounOfWlPeople = idMembers.length;
+    if (amounOfWlPeople <= 150) {
+      resolve(config.levels.level_1.level);
+    }
+    if (amounOfWlPeople <= 500) {
+      resolve(config.levels.level_2.level);
+    }
+    if (amounOfWlPeople <= 950) {
+      resolve(config.levels.level_3.level);
+    }
+    if (amounOfWlPeople <= 1400) {
+      resolve(config.levels.level_4.level);
+    }
+    if (amounOfWlPeople <= 1750) {
+      resolve(config.levels.level_5.level);
+    }
+  });
+}
+
+function addUserToWLDataBase(userToAdd) {
+  if (!wl_db.tiene(userToAdd.guild.id))
+    wl_db.establecer(userToAdd.guild.id, {});
+  if (!wl_db.tiene(`${userToAdd.guild.id}.${userToAdd.id}`)) {
+    console.log('entro a agregar a wl');
+    wl_db.establecer(`${userToAdd.guild.id}.${userToAdd.id}`, {
+      name: userToAdd.user.username,
+      userId: userToAdd.id,
     });
   }
-  
+}

@@ -1,3 +1,4 @@
+const Discord = require("discord.js");
 var { client } = require("../commands/commands_file.js");
 const config = require("../config.json");
 const db = require("megadb");
@@ -6,30 +7,31 @@ let modernarray = require("modernarray");
 const { Invite } = require("discord.js");
 let invites_db = new db.crearDB("invites");
 let level_db = new db.crearDB("levels");
+let wl_db = new db.crearDB("wl_People");
 let myWelcomeChannel = "927999666358980658";
+let sonsOfGodsGuild = "926465898582253618";
+let WLRoleId = "937127841592651786";
+let levelChannel = "938964691244441611";
 
 function promoteToWL(invite) {
   let userToPromote;
   level_db
     .find(`${invite.guild.id}`, (thisUser) => {
-      console.log('buscando');
       if (thisUser.userId == invite.inviter.id) {
         userToPromote = thisUser;
-        console.log(thisUser.tag);
       }
     })
     .then((thisUser) => {
       if (userToPromote) {
-        console.log("userToPromote level " + userToPromote.nivel);
         if (userToPromote.nivel >= config.levelToEnterWL) {
-          let WLRoleId = "937127841592651786";
           let WLRole = invite.guild.roles.cache.get(WLRoleId);
 
           userToAddRole = invite.guild.members.cache.find(
             (thisMember) => thisMember.id === invite.inviter.id
           );
-          console.log(userToAddRole);
           userToAddRole.roles.add(WLRole);
+          promotedToWLMessage(invite);
+          addUserToWLDataBase(userToAddRole);
         }
       }
     });
@@ -278,15 +280,9 @@ async function newUser(member, invite, channel) {
           })
           .then((thisUser) => {
             getLevelOfWL(member).then((levelOfWL) => {
-              invites_db
-                .obtener(
-                  `${invite.guild.id}.${userToPromoteWL.userId}.validInvites`
-                )
-                .then(function (userValidInvites) {
-                  if (userValidInvites >= levelOfWL) {
+                  if (userToPromoteWL.validInvites >= levelOfWL) {
                     promoteToWL(invite);
                   }
-                });
             });
           });
       }
@@ -318,6 +314,32 @@ async function getLevelOfWL(message) {
       resolve(config.levels.level_5.invites);
     }
   });
+}
+
+function promotedToWLMessage(invite) {
+  const channelToSend = invite.guild.channels.cache.find(
+    (channel) => channel.id === levelChannel
+  );
+  const embed = new Discord.MessageEmbed()
+    .setColor("YELLOW")
+    .setDescription(
+      `<@${invite.inviter.id}> congratulations you just earned a place in the White List!`
+    );
+  channelToSend.send({ embeds: [embed] });
+}
+
+
+
+function addUserToWLDataBase(userToAdd) {
+  if (!wl_db.tiene(userToAdd.guild.id))
+    wl_db.establecer(userToAdd.guild.id, {});
+  if (!wl_db.tiene(`${userToAdd.guild.id}.${userToAdd.id}`)) {
+    console.log('entro a agregar a wl');
+    wl_db.establecer(`${userToAdd.guild.id}.${userToAdd.id}`, {
+      name: userToAdd.user.username,
+      userId: userToAdd.id,
+    });
+  }
 }
 
 client.on("guildMemberRemove", async (member) => {

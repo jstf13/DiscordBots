@@ -13,6 +13,14 @@ let sonsOfGodsGuild = "926465898582253618";
 let WLRoleId = "937127841592651786";
 let levelChannel = "938964691244441611";
 
+client.on("ready", () => {
+  if (!invites_db.tiene(sonsOfGodsGuild)) invites_db.establecer(sonsOfGodsGuild, {});
+  if (!wl_db.tiene(sonsOfGodsGuild))
+    wl_db.establecer(sonsOfGodsGuild, {
+      wl_members: 0,
+    });
+});
+
 function promoteToWL(invite) {
   let userToPromote;
   level_db
@@ -279,11 +287,13 @@ async function newUser(member, invite, channel) {
             }
           })
           .then((thisUser) => {
-            getLevelOfWL(member).then((levelOfWL) => {
-              if (userToPromoteWL.validInvites >= levelOfWL) {
-                promoteToWL(invite);
-              }
-            });
+            if (userToPromoteWL != undefined) {
+              getLevelOfWL(member).then((levelOfWL) => {
+                if (userToPromoteWL.validInvites >= levelOfWL) {
+                  promoteToWL(invite);
+                }
+              });
+            }
           });
       }
     });

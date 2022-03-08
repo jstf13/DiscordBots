@@ -9,6 +9,15 @@ let invites_db = new db.crearDB("invites");
 let wl_db = new db.crearDB("wl_People");
 let levelChannel = "938964691244441611";
 let WLRoleId = "937127841592651786";
+let sonsOfGodsGuild = "926465898582253618";
+
+client.on("ready", () => {
+  if (!levels_db.tiene(sonsOfGodsGuild)) levels_db.establecer(sonsOfGodsGuild, {});
+  if (!wl_db.tiene(sonsOfGodsGuild))
+    wl_db.establecer(sonsOfGodsGuild, {
+      wl_members: 0,
+    });
+});
 
 function promoteToWL(message) {
   let userToPromote;
@@ -111,36 +120,31 @@ client.on("message", async (message) => {
 
 async function getLevelOfWL(message) {
   return new Promise((resolve) => {
-    let idMembers = message.guild.roles.cache
-      .get("937127841592651786")
-      .members.map((m) => m.user.tag);
-    console.log(idMembers);
-    let amounOfWlPeople = idMembers.length;
-    if (amounOfWlPeople <= 150) {
-      resolve(config.levels.level_1.level);
-    }
-    if (amounOfWlPeople <= 500) {
-      resolve(config.levels.level_2.level);
-    }
-    if (amounOfWlPeople <= 950) {
-      resolve(config.levels.level_3.level);
-    }
-    if (amounOfWlPeople <= 1400) {
-      resolve(config.levels.level_4.level);
-    }
-    if (amounOfWlPeople <= 1750) {
-      resolve(config.levels.level_5.level);
-    }
+    wl_db
+      .obtener(`${message.guild.id}.wl_members`)
+      .then(function (amounOfWlPeople) {
+        if (amounOfWlPeople <= 150) {
+          resolve(config.levels.level_1.level);
+        }
+        if (amounOfWlPeople <= 500) {
+          resolve(config.levels.level_2.level);
+        }
+        if (amounOfWlPeople <= 950) {
+          resolve(config.levels.level_3.level);
+        }
+        if (amounOfWlPeople <= 1400) {
+          resolve(config.levels.level_4.level);
+        }
+        if (amounOfWlPeople <= 1750) {
+          resolve(config.levels.level_5.level);
+        }
+      });
   });
 }
 
 function addUserToWLDataBase(userToAdd) {
   return new Promise((resolve) => {
     let wasAdded = false;
-    if (!wl_db.tiene(userToAdd.guild.id))
-      wl_db.establecer(userToAdd.guild.id, {
-        wl_members: 0,
-      });
     if (!wl_db.tiene(`${userToAdd.guild.id}.${userToAdd.id}`)) {
       wl_db.establecer(`${userToAdd.guild.id}.${userToAdd.id}`, {
         name: userToAdd.user.username,

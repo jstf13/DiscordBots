@@ -1,1 +1,36 @@
-{}
+{
+  "926465898582253618": {
+    "785828317608804403": {
+      "user": "pia",
+      "userId": "785828317608804403",
+      "gests": [],
+      "validInvites": 0,
+      "codes": [
+        "5mDRHfap",
+        "4ehGja75"
+      ],
+      "complete_codes": {
+        "4ehGja75": {
+          "uses": 0
+        },
+        "5mDRHfap": {
+          "uses": 0
+        }
+      }
+    },
+    "426072100265000961": {
+      "user": "jstf13",
+      "userId": "426072100265000961",
+      "gests": [],
+      "validInvites": 0,
+      "codes": [
+        "7rygMzJC"
+      ],
+      "complete_codes": {
+        "7rygMzJC": {
+          "uses": 0
+        }
+      }
+    }
+  }
+}

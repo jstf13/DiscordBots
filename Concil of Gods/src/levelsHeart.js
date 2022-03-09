@@ -29,19 +29,21 @@ function promoteToWL(message) {
     })
     .then((thisUser) => {
       if (userToPromote) {
-        if (userToPromote.validInvites >= config.invitesToEnterWL) {
-          let WLRole = message.guild.roles.cache.get(WLRoleId);
+        getNeededIvnitesOfWL().then((neededInvitesOfWL) => {
+          if (userToPromote.validInvites >= neededInvitesOfWL) {
+            let WLRole = message.guild.roles.cache.get(WLRoleId);
 
-          userToAddRole = message.guild.members.cache.find(
-            (thisMember) => thisMember.id === message.author.id
-          );
-          userToAddRole.roles.add(WLRole);
-          addUserToWLDataBase(userToAddRole).then((wasAdded) => {
-            if (wasAdded) {
-              promotedToWLMessage(message);
-            }
-          });
-        }
+            userToAddRole = message.guild.members.cache.find(
+              (thisMember) => thisMember.id === message.author.id
+            );
+            userToAddRole.roles.add(WLRole);
+            addUserToWLDataBase(userToAddRole).then((wasAdded) => {
+              if (wasAdded) {
+                promotedToWLMessage(message);
+              }
+            });
+          }
+        });
       }
     });
 }
@@ -99,48 +101,23 @@ client.on("message", async (message) => {
     });
 
     const embed = new Discord.MessageEmbed()
-      .setColor("RANDOM")
+      .setColor("BLACK")
       .setThumbnail(message.author.displayAvatarURL())
       .setDescription(
         `${message.member} acabas de subir de nivel: ${parseInt(nivel + 1)}!`
       );
     channelToSend.send({ embeds: [embed] });
 
-    getLevelOfWL(message).then((levelOfWL) => {
+    getNeededLevelOfWL().then((levelOfWL) => {
       if (nivel + 1 >= levelOfWL) {
         promoteToWL(message);
       }
     });
   } else {
     levels_db.sumar(`${message.guild.id}.${message.author.id}.xp`, randomxp);
-    //console.log(`${message.author.tag}, ganaste: ${randomxp}`);
     return;
   }
 });
-
-async function getLevelOfWL(message) {
-  return new Promise((resolve) => {
-    wl_db
-      .obtener(`${message.guild.id}.wl_members`)
-      .then(function (amounOfWlPeople) {
-        if (amounOfWlPeople <= 150) {
-          resolve(config.levels.level_1.level);
-        }
-        if (amounOfWlPeople <= 500) {
-          resolve(config.levels.level_2.level);
-        }
-        if (amounOfWlPeople <= 950) {
-          resolve(config.levels.level_3.level);
-        }
-        if (amounOfWlPeople <= 1400) {
-          resolve(config.levels.level_4.level);
-        }
-        if (amounOfWlPeople <= 1750) {
-          resolve(config.levels.level_5.level);
-        }
-      });
-  });
-}
 
 function addUserToWLDataBase(userToAdd) {
   return new Promise((resolve) => {
@@ -154,5 +131,51 @@ function addUserToWLDataBase(userToAdd) {
       wasAdded = true;
     }
     resolve(wasAdded);
+  });
+}
+
+async function getNeededLevelOfWL() {
+  return new Promise((resolve) => {
+    wl_db.obtener(`${myGuildId}.wl_members`).then(function (amounOfWlPeople) {
+      if (amounOfWlPeople <= 150) {
+        resolve(config.levels.level_1.level);
+      }
+      if (amounOfWlPeople <= 500) {
+        resolve(config.levels.level_2.level);
+      }
+      if (amounOfWlPeople <= 950) {
+        resolve(config.levels.level_3.level);
+      }
+      if (amounOfWlPeople <= 1400) {
+        resolve(config.levels.level_4.level);
+      }
+      if (amounOfWlPeople <= 1750) {
+        resolve(config.levels.level_5.level);
+      }
+    });
+  });
+}
+
+async function getNeededIvnitesOfWL() {
+  return new Promise((resolve) => {
+    wl_db
+      .obtener(`${myGuildId}.wl_members`)
+      .then(function (amounOfWlPeople) {
+        if (amounOfWlPeople <= 150) {
+          resolve(config.levels.level_1.invites);
+        }
+        if (amounOfWlPeople <= 500) {
+          resolve(config.levels.level_2.invites);
+        }
+        if (amounOfWlPeople <= 950) {
+          resolve(config.levels.level_3.invites);
+        }
+        if (amounOfWlPeople <= 1400) {
+          resolve(config.levels.level_4.invites);
+        }
+        if (amounOfWlPeople <= 1750) {
+          resolve(config.levels.level_5.invites);
+        }
+      });
   });
 }

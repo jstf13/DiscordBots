@@ -2,9 +2,9 @@ var {client} = require("../commands/commands_file");
 
 client.on("message", async message => {
     let blacklistedSpanish = ['puto', 'puta', 'hijo de puta', 'la puta que te pario', 'la concha de tu madre',
-     'hijo de remil pute', 'chupamela', 'chupa pija', 'sos una pija', 'pija']; 
+     'hijo de remil puta', 'chupamela', 'chupa pija', 'sos una pija', 'pija']; 
      
-    let blacklistedEnglish = ['son of a bitch', 'fuck you', 'asshole' ,'ashole', 'asole', 'fu', 'son of a bitch', 
+    let blacklistedEnglish = ['son of a bitch', 'fuck you', 'asshole' ,'ashole', 'asole', 'son of a bitch', 
     'pussy', 'cock', 'dick', 'bastard', 'motherfucker', 'nigga', 'nigger'];
 
     let foundInTextSpanish = false;

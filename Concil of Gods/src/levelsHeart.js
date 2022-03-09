@@ -7,14 +7,14 @@ const { client } = require("../commands/commands_file");
 let levels_db = new db.crearDB("levels");
 let invites_db = new db.crearDB("invites");
 let wl_db = new db.crearDB("wl_People");
-let levelChannel = "938964691244441611";
-let WLRoleId = "937127841592651786";
-let sonsOfGodsGuild = "926465898582253618";
+let WLRoleId = config.roles.wlRole;
+let levelChannel = config.channelsIds.levelChannel;
+let myGuildId = config.serverIds.sonsOfGodsGuildId;
 
 client.on("ready", () => {
-  if (!levels_db.tiene(sonsOfGodsGuild)) levels_db.establecer(sonsOfGodsGuild, {});
-  if (!wl_db.tiene(sonsOfGodsGuild))
-    wl_db.establecer(sonsOfGodsGuild, {
+  if (!levels_db.tiene(myGuildId)) levels_db.establecer(myGuildId, {});
+  if (!wl_db.tiene(myGuildId))
+    wl_db.establecer(myGuildId, {
       wl_members: 0,
     });
 });

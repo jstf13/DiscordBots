@@ -4,26 +4,38 @@ const config = require("../config.json");
 const db = require("megadb");
 
 let modernarray = require("modernarray");
-const { Invite } = require("discord.js");
 let invites_db = new db.crearDB("invites");
 let level_db = new db.crearDB("levels");
 let wl_db = new db.crearDB("wl_People");
-let myWelcomeChannel = "927999666358980658";
-let sonsOfGodsGuild = "926465898582253618";
-let WLRoleId = "937127841592651786";
-let levelChannel = "938964691244441611";
+let WLRoleId = config.roles.wlRole;
+let levelChannel = config.channelsIds.levelChannel;
+let myGuildId = config.serverIds.sonsOfGodsGuildId;
 
 client.on("ready", () => {
   console.log("Pairing invites from discord to our BDD");
   console.log("================================================");
-  if (!invites_db.tiene(sonsOfGodsGuild))
-    invites_db.establecer(sonsOfGodsGuild, {});
-  if (!wl_db.tiene(sonsOfGodsGuild))
-    wl_db.establecer(sonsOfGodsGuild, {
+  if (!invites_db.tiene(myGuildId)) invites_db.establecer(myGuildId, {});
+  if (!wl_db.tiene(myGuildId))
+    wl_db.establecer(myGuildId, {
       wl_members: 0,
     });
   addLostInvites();
+  removeUnusedInvites();
+  // addItemsForInvites_db(1500);
 });
+
+function cleanBddOnceADay(params) {
+  var now = new Date();
+  var millisTill10 =
+    new Date(now.getFullYear(), now.getMonth(), now.getDate(), 3, 30, 0, 0) -
+    now;
+  if (millisTill10 < 0) {
+    millisTill10 += 86400000; // it's after 10am, try 10am tomorrow.
+  }
+  setTimeout(function () {
+    console.log("It's 10am!");
+  }, millisTill10);
+}
 
 function promoteToWL(invite) {
   let userToPromote;
@@ -81,65 +93,44 @@ client.on("inviteCreate", (invite) => {
   //  });
 });
 
-client.on("inviteDelete", (invite) => {
-  getInviteByCode(invite).then((result) => {
-    //   isAIgnoredId(result).then((isIgnored) => {
-    // if (isIgnored == false) {
-    console.log(invite.guild.id + " " + result);
-    if (invites_db.tiene(`${invite.guild.id}.${result}.codes`)) {
-      invites_db.extract(`${invite.guild.id}.${result}.codes`, invite.code);
-      invites_db.eliminar(
-        `${invite.guild.id}.${result}.complete_codes.${invite.code}`
-      );
-    }
-    removeUnusedInvites(invite);
-    // }
-    //   });
-  });
-});
+function removeUnusedInvites() {
+  console.log("================================================");
+  console.log("Deleting expired invitations ");
+  console.log("================================================");
+  client.guilds.fetch(`${myGuildId}`).then((g) => {
+    invites_db.find(`${myGuildId}`, (user) => {
+      let invitesCodes = user.codes;
+      for (let i = invitesCodes.length - 1; i >= 0; i--) {
+        let exists = false;
+        g.invites.fetch().then((thisUserGuildInvites) => {
+          thisUserGuildInvites.each((guiInvite) => {
+            if (invitesCodes[i] == guiInvite.code) {
+              exists = true;
+            }
+          });
 
-function removeUnusedInvites(invite) {
-  invite.guild.invites.fetch().then((guildInvites) => {
-    //get all guild invites
-
-    let actualInvites = invites_db.obtener(
-      `${invite.guild.id}.${invite.channel.guild.ownerId}.codes`
-    );
-
-    actualInvites.then(function (result) {
-      result.each((element) => {
-        let isInside = false;
-
-        guildInvites.each((guiInvite) => {
-          if (guiInvite.code == element) {
-            isInside = true;
+          if (!exists) {
+            let code = invitesCodes[i];
+            invites_db.extract(`${myGuildId}.${user.userId}.codes`, code);
+            invites_db.eliminar(
+              `${myGuildId}.${user.userId}.complete_codes.${code}`
+            );
           }
         });
-
-        if (isInside == false) {
-          invites_db.eliminar(
-            `${invite.guild.id}.${invite.channel.guild.ownerId}.complete_codes.${element}`
-          );
-          invites_db.extract(
-            `${invite.guild.id}.${invite.channel.guild.ownerId}.codes`,
-            element
-          );
-          inviteToRemove = undefined;
-        }
-      });
+      }
     });
   });
+
+  console.log("================================================");
+  console.log("Expired invitations deleted");
+  console.log("================================================");
 }
 
 client.on("guildMemberAdd", async (member) => {
   const channel = member.guild.channels.cache.find(
-    (channel) => channel.id === myWelcomeChannel
+    (channel) => channel.id === config.channelsIds.welcomeChannel
   );
-
-  console.log("=====================ENTRO A NEW USED===============");
   newUsedInvites(member, channel).then((usedinvite, differenscesInInvi) => {
-    console.log("=====================SALI A NEW USED===============");
-
     if (usedinvite != undefined) {
       newUser(member, usedinvite, differenscesInInvi, channel);
     }
@@ -149,7 +140,7 @@ client.on("guildMemberAdd", async (member) => {
 
 function addLostInvites() {
   return new Promise((resolve) => {
-    client.guilds.fetch(`${sonsOfGodsGuild}`).then((g) => {
+    client.guilds.fetch(`${myGuildId}`).then((g) => {
       g.invites.fetch().then((guildInvites) => {
         guildInvites.each((invite) => {
           let isInTheList = false;
@@ -217,10 +208,9 @@ function newUsedInvites(member, channel) {
               }
             }
             if (isFromGods == false) {
-                channel.send(
-                  `${member.user.tag} joined using master code ${invi.code} from ${invi.inviter.tag}.`
-                );
-              
+              channel.send(
+                `${member.user.tag} joined using master code ${invi.code} from ${invi.inviter.tag}.`
+              );
             }
             mayor_resolve(invi);
           }
@@ -234,10 +224,9 @@ function newUsedInvites(member, channel) {
               }
             }
             if (isFromGods == false) {
-                channel.send(
-                  `${member.user.tag} joined using master code ${invi.code} from ${invi.inviter.tag}.`
-                );
-              
+              channel.send(
+                `${member.user.tag} joined using master code ${invi.code} from ${invi.inviter.tag}.`
+              );
             }
             invites_db.establecer(
               `${invi.guild.id}.${invi.inviter.id}.complete_codes.${invi.code}.uses`,
@@ -393,11 +382,9 @@ function getInviteByCode(invite) {
   return new Promise((resolve) => {
     invite.guild.invites.fetch().then((guildInvites) => {
       guildInvites.each((guiInvite) => {
-        // console.log('INVITACION ' + guiInvite.code + ' ' + guiInvite.inviter.id)
-        //console.log('COMPARA ' + guiInvite.code + ' ' + invite)
+        console.log(guiInvite.code + " comparo con: " + invite);
         if (guiInvite.code == invite) {
-          // console.log('====== ELIGE ======= ' + guiInvite.code + ' ' + guiInvite.inviter.id)
-          resolve(guiInvite.inviter.id);
+           resolve(guiInvite.inviter.id);
           return;
         }
       });
@@ -406,3 +393,25 @@ function getInviteByCode(invite) {
 }
 
 /*---Close Level zone ---*/
+
+// TEST FUNCTIONS //
+
+function addItemsForInvites_db(amount) {
+  for (let i = 0; i <= amount; i++) {
+    invites_db.establecer(`${myGuildId}.${i}`, {
+      user: "jagger",
+      userId: i,
+      gests: [],
+      validInvites: 0,
+      codes: ["s63JQTfu", "s6gJQTfu"],
+      complete_codes: {
+        ["s63JQTfu"]: {
+          uses: 0,
+        },
+        ["s6gJQTfu"]: {
+          uses: 0,
+        },
+      },
+    });
+  }
+}

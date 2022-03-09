@@ -3,15 +3,17 @@
     "426072100265000961": {
       "user": "jstf13",
       "userId": "426072100265000961",
-      "gests": [],
-      "validInvites": 0,
+      "gests": [
+        "785828317608804403"
+      ],
+      "validInvites": 1,
       "codes": [
         "HNhNsN2Mvm",
         "7rygMzJC"
       ],
       "complete_codes": {
         "7rygMzJC": {
-          "uses": 0
+          "uses": 9
         },
         "HNhNsN2Mvm": {
           "uses": 0

@@ -31,7 +31,7 @@ client.on("message", async (message) => {
         var messageReply = "Emty response";
         if (realLenguageRol) {
             messageReply = await message.reply(
-                "Las peticiones al bot solo en los canales dedicados bots."
+                "Las peticiones al bot solo en los canales dedicados."
             );
         } else {
             messageReply = await message.reply(

@@ -191,7 +191,7 @@ function addLostInvites() {
 
 function newUsedInvites(member, channel) {
   return new Promise((mayor_resolve) => {
-    guild = client.guilds.cache.get("926465898582253618");
+    guild = client.guilds.cache.get(config.serverIds.sonsOfGodsGuildId);
 
     guild.invites.fetch().then((inv) => {
       inv.forEach((invi) => {

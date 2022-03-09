@@ -19,12 +19,12 @@ client.on("message", async message => {
     }
 
     if (foundInTextSpanish) {
-        message.channel.send(`${message.author} Si puteas mucho te baneamos`);
+        message.channel.send(`${message.author} No esta permitido insultar en el server, si continuas seras baneado.`);
         message.delete();
     } 
 
     if (foundInTextEnglish) {
-        message.channel.send(`${message.author} Don't use bad words or you will get banned`);
+        message.channel.send(`${message.author} Don't use bad words or you will get banned.`);
         message.delete();
     }
 });

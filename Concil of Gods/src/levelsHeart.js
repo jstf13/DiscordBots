@@ -21,21 +21,31 @@ client.on("ready", () => {
 
 function promoteToWL(message) {
   let userToPromote;
-  invites_db
-    .find(`${message.guild.id}`, (thisUser) => {
-      if (thisUser.userId == message.author.id) {
-        userToPromote = thisUser;
-      }
-    })
-    .then((thisUser) => {
-      if (userToPromote) {
-        getNeededIvnitesOfWL().then((neededInvitesOfWL) => {
-          if (userToPromote.validInvites >= neededInvitesOfWL) {
-            let WLRole = message.guild.roles.cache.get(WLRoleId);
+  let WLRole = message.guild.roles.cache.get(WLRoleId);
 
-            userToAddRole = message.guild.members.cache.find(
-              (thisMember) => thisMember.id === message.author.id
-            );
+  userToAddRole = message.guild.members.cache.find(
+    (thisMember) => thisMember.id === message.author.id
+  );
+
+  getNeededIvnitesOfWL().then((neededInvitesOfWL) => {
+    if (neededInvitesOfWL == 0) {
+      userToAddRole.roles.add(WLRole);
+      addUserToWLDataBase(userToAddRole).then((wasAdded) => {
+        if (wasAdded) {
+          promotedToWLMessage(message);
+        }
+      });
+    }
+    invites_db
+      .find(`${message.guild.id}`, (thisUser) => {
+        if (thisUser.userId == message.author.id) {
+          userToPromote = thisUser;
+        }
+      })
+      .then((thisUser) => {
+        if (userToPromote) {
+          console.log(neededInvitesOfWL);
+          if (userToPromote.validInvites >= neededInvitesOfWL) {
             userToAddRole.roles.add(WLRole);
             addUserToWLDataBase(userToAddRole).then((wasAdded) => {
               if (wasAdded) {
@@ -43,9 +53,9 @@ function promoteToWL(message) {
               }
             });
           }
-        });
-      }
-    });
+        }
+      });
+  });
 }
 
 function promotedToWLMessage(message) {
@@ -158,24 +168,22 @@ async function getNeededLevelOfWL() {
 
 async function getNeededIvnitesOfWL() {
   return new Promise((resolve) => {
-    wl_db
-      .obtener(`${myGuildId}.wl_members`)
-      .then(function (amounOfWlPeople) {
-        if (amounOfWlPeople <= 150) {
-          resolve(config.levels.level_1.invites);
-        }
-        if (amounOfWlPeople <= 500) {
-          resolve(config.levels.level_2.invites);
-        }
-        if (amounOfWlPeople <= 950) {
-          resolve(config.levels.level_3.invites);
-        }
-        if (amounOfWlPeople <= 1400) {
-          resolve(config.levels.level_4.invites);
-        }
-        if (amounOfWlPeople <= 1750) {
-          resolve(config.levels.level_5.invites);
-        }
-      });
+    wl_db.obtener(`${myGuildId}.wl_members`).then(function (amounOfWlPeople) {
+      if (amounOfWlPeople <= 150) {
+        resolve(config.levels.level_1.invites);
+      }
+      if (amounOfWlPeople <= 500) {
+        resolve(config.levels.level_2.invites);
+      }
+      if (amounOfWlPeople <= 950) {
+        resolve(config.levels.level_3.invites);
+      }
+      if (amounOfWlPeople <= 1400) {
+        resolve(config.levels.level_4.invites);
+      }
+      if (amounOfWlPeople <= 1750) {
+        resolve(config.levels.level_5.invites);
+      }
+    });
   });
 }

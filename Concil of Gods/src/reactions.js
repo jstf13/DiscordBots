@@ -5,7 +5,7 @@ const config = require("../config.json");
 client.on('messageReactionAdd', async (reaction, user) => {
 
     let lenguageMessage = config.messagesIds.lenguage;
-    let welcomeMessage = config.messagesIds.wecome;
+    let welcomeMessage = config.messagesIds.welcome;
 
 	// When a reaction is received, check if the structure is partial
 	if (reaction.partial) {

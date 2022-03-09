@@ -21,7 +21,7 @@ client.on('messageReactionAdd', async (reaction, user) => {
 
     if (reaction.message.id == welcomeMessage && reaction.emoji.name === '✅') {
         try {
-            let commonRole = reaction.message.guild.roles.cache.get("926470689249189918");
+            let commonRole = reaction.message.guild.roles.cache.get(config.roles.sonOfGod);
             let reactedUser =  reaction.message.guild.members.cache.find(member => member.id === user.id)
             reactedUser.roles.add(commonRole);
          } catch {

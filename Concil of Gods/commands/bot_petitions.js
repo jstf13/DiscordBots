@@ -144,11 +144,11 @@ client.on("message", async message => {
                     .setColor(0x00AE86)
                     .setFooter("Este es un importante mensaje de los dioses.", client.user.avatarURL())
                     .setTimestamp()
-                    .addField("Regla 1 - No espamear.", "This includes repeated use of bot commands, misuse of spoiler tags / code blocks / special text, rapidly switching voice channels or tagging people who are not currently active in the chat.\n\n")
+                    .addField("Regla 1 - No espamear.", "Esto incluye el uso repetido de comandos de bot, el uso indebido de etiquetas de spoiler, bloques de código o texto especial, cambiar rápidamente de canal de voz o etiquetar a personas que no están activas en ese momento en el chat.\n\n")
                     .addField("Regla 2 - No avisos ni ventas. "," Este servidor no es un mercado: no pidas dinero o monedas de juegos, no intentes comprar / vender / regalar nada, ni pedirle a la gente que se una a tu servidor o comunidad de Discord. Esto incluye enviar mensajes a cualquier usuario del servidor.\n\n")
                     .addField("Regla 3 - Se respetuoso", "Debes respetar a todos los usuarios, independientemente de tu agrado hacia ellos. Trata a los demás como quieres ser tratado.\n\n")
                     .addField("Regla 4 - Sin discursos de odio ni trolling.", "El acoso, el discurso de odio, el racismo, el sexismo no están permitidos aquí. Este servidor tiene una política de tolerancia cero para dichos mensajes y es posible que se le prohíba el acceso al servidor inmediatamente sin previo aviso.\n\n")
-                    .addField(" REACT WITH ✅ IF YOU UNDERSTUND THE RULES!!", "_");
+                    .addField(" REACCIONA CON ✅ PARA SER VERIFICADO Y ACCEDER AL SERVIDOR!!", "_");
                     message.channel.send({ embeds: [embedDatos2] }).then(embedDatos2 => {
                         embedDatos2.react("✅");
                     });
@@ -160,7 +160,7 @@ client.on("message", async message => {
                     .setTitle("RULES:")
                     .setAuthor(client.user.username, client.user.displayAvatarURL())
                     .setColor(0x00AE86)
-                    .setFooter("This is an importan message from the gods.", client.user.avatarURL())
+                    .setFooter("This is an important message from the gods.", client.user.avatarURL())
                     .setTimestamp()
                     .addField("Rule 1 - No spamming.", "This includes repeated use of bot commands, misuse of spoiler tags / code blocks / special text, rapidly switching voice channels or tagging people who are not currently active in the chat.\n\n")
                     .addField("Rule 2 - No advertising or selling.", "This server is not a marketplace: do not ask for money or in-game currency, try to buy / sell / giveaway anything, or ask people to join your Discord server or community. This includes messaging any user on the server.\n\n")
@@ -177,12 +177,12 @@ client.on("message", async message => {
                 const embedDatos3 = new Discord.MessageEmbed() 
                 .setTitle("SELECT YOUR LANGUAGE")
                 .setColor(0x00AE86)
-                .setFooter("This is an importan message from the gods.")
+                .setFooter("This is an important message from the gods.")
                 .setTimestamp()
                 .addField("🇪🇸 ESPAÑOL", "Reacciona con esta bandera para habilitar los canales en español.")
                 .addField("🇬🇧 ENGLISH", "React with this flag to enable English channels.")
-                .addField("❗IMPORTANT", "You can react with both flags and you will have access to both channels of each theme.")
-                .addField("❗IMPORTANTE", "Puedes reaccionar con ambas banderas y tendrás acceso a ambos canales de cada tematica.")
+                .addField("❗IMPORTANT", "You can react with both flags and you will have access to all channels.")
+                .addField("❗IMPORTANTE", "Puedes reaccionar con ambas banderas y tendrás acceso a todos los canales.")
                 message.channel.send({ embeds: [embedDatos3] }).then( embedDatos3 => {
                     embedDatos3.react('🇪🇸');
                     embedDatos3.react('🇬🇧');
@@ -190,11 +190,43 @@ client.on("message", async message => {
                 message.react.tick
                 break;
 
+            case "embedwlrules":
+                const embedDatos8 = new Discord.MessageEmbed() 
+                .setTitle("WHITELIST")
+                .setColor(0x00AE86)
+                .setFooter("This is an important message from the gods.")
+                .setTimestamp()
+                .addField("INFORMATION", "The Sons of Gods Whitelist will reward 2000 early supporters with guaranteed slots for them to mint at least one Sons of Gods.")
+                .addField("1st Group", "The first 150 people to join the server and reach level 2 will instantly get a place in the Whitelist.")
+                .addField("2nd Group", "350 places for members that invite 3 other people (lvl 3 required).")
+                .addField("3rd Group", "450 places for members that invite 5 other people (lvl 3 required).")
+                .addField("4th Group", "450 places for members that invite 7 other people (lvl 5 required).")
+                .addField("5th Group", "450 places for members that invite 10 other people (lvl 5 required).")
+                .addField("VIP Group", "150 VIP places designated manually.")
+                break;    
+
+            case "embedwlrulesES":
+                const embedDatos9 = new Discord.MessageEmbed() 
+                .setTitle("WHITELIST")
+                .setColor(0x00AE86)
+                .setFooter("Este es un importante mensaje de los dioses.")
+                .setTimestamp()
+                .addField("INFORMACION", "La Whitelist de Sons of Gods recompensará a 2000 miembros con espacios garantizados para mintear al menos un Sons of Gods.")
+                .addField("1er Grupo", "Las primeras 150 personas en unirse al servidor y alcanzar el nivel 2 obtendrán instantáneamente un lugar en la Whitelist.")
+                .addField("2do Grupo", "350 lugares para miembros que inviten a otras 3 personas (se requiere nivel 3).")
+                .addField("3ro Grupo", "450 lugares para miembros que inviten a otras 5 personas (se requiere nivel 3).")
+                .addField("4to Grupo", "450 lugares para miembros que inviten a otras 7 personas (se requiere nivel 5).")
+                .addField("5to Grupo", "450 lugares para miembros que inviten a otras 10 personas (se requiere nivel 5).")
+                .addField("Grupo VIP", "150 lugares VIP designados manualmente.")
+                break;       
+
+
+
             case "embedfaq-english":
                 const embedDatos4 = new Discord.MessageEmbed() 
-                .setTitle("FAQ")
+                .setTitle("WHITELIST")
                 .setColor(0x00AE86)
-                .setFooter("This is a clarification from the gods.")
+                .setFooter("This is an important message from the gods.")
                 .setTimestamp()
                 .addField("What is the web?", "🔥🔥  [sonsofgods.io](https://sonsofgods.io/)  🔥🔥")
                 .addField("When is the mint date?", "The mint date will be on February 9.")

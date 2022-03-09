@@ -14,11 +14,15 @@ let WLRoleId = "937127841592651786";
 let levelChannel = "938964691244441611";
 
 client.on("ready", () => {
-  if (!invites_db.tiene(sonsOfGodsGuild)) invites_db.establecer(sonsOfGodsGuild, {});
+  console.log("Pairing invites from discord to our BDD");
+  console.log("================================================");
+  if (!invites_db.tiene(sonsOfGodsGuild))
+    invites_db.establecer(sonsOfGodsGuild, {});
   if (!wl_db.tiene(sonsOfGodsGuild))
     wl_db.establecer(sonsOfGodsGuild, {
       wl_members: 0,
     });
+  addLostInvites();
 });
 
 function promoteToWL(invite) {
@@ -103,7 +107,7 @@ function removeUnusedInvites(invite) {
     );
 
     actualInvites.then(function (result) {
-      result.forEach((element) => {
+      result.each((element) => {
         let isInside = false;
 
         guildInvites.each((guiInvite) => {
@@ -127,134 +131,127 @@ function removeUnusedInvites(invite) {
   });
 }
 
-// function addLostInvites(invite) {
-//   invite.guild.invites.fetch().then((guildInvites) => {
-//         guildInvites.each((guiInvite) => {
-
-//           codes = invites_db.obtener(
-//             `${guiInvite.guild.id}.${guiInvite.inviter.id}.codes`
-//           ).then(function (code)  {
-
-//           })
-
-//           if (guiInvite.code == element) {
-//             isInside = true;
-//           }
-//         });
-
-//         if (isInside == false) {
-//           invites_db.eliminar(
-//             `${invite.guild.id}.${invite.channel.guild.ownerId}.complete_codes.${element}`
-//           );
-//           invites_db.extract(
-//             `${invite.guild.id}.${invite.channel.guild.ownerId}.codes`,
-//             element
-//           );
-//           inviteToRemove = undefined;
-//         }
-//       });
-//     });
-//   });
-// }
-
 client.on("guildMemberAdd", async (member) => {
   const channel = member.guild.channels.cache.find(
     (channel) => channel.id === myWelcomeChannel
   );
 
-  member.guild.invites.fetch().then((guildInvites) => {
-    //get all guild invites
+  console.log("=====================ENTRO A NEW USED===============");
+  newUsedInvites(member, channel).then((usedinvite, differenscesInInvi) => {
+    console.log("=====================SALI A NEW USED===============");
 
-    guildInvites.each((invite) => {
-      let isInTheList = false;
-      //basically a for loop over the invites:
-      if (!invites_db.tiene(`${invite.guild.id}.${invite.inviterId}`)) {
-        invites_db.establecer(`${invite.guild.id}.${invite.inviterId}`, {
-          user: invite.inviter.username,
-          userId: invite.inviter.id,
-          gests: [],
-          validInvites: 0,
-          codes: [invite.code],
-          complete_codes: {
-            [invite.code]: {
-              uses: 0,
-            },
-          },
-        });
-      }
-      removeUnusedInvites(invite);
-
-      codes = invites_db.obtener(
-        `${invite.guild.id}.${invite.inviter.id}.codes`
-      );
-
-      codes.then(function (result) {
-        res = result;
-        for (let i = 0; i < res.length && isInTheList == false; i++) {
-          if (res[i] == invite.code) isInTheList = true;
-        }
-        if (!isInTheList) {
-          invites_db.push(
-            `${invite.guild.id}.${invite.inviter.id}.codes`,
-            invite.code
-          );
-          invites_db.establecer(
-            `${invite.guild.id}.${invite.inviter.id}.complete_codes.${invite.code}.uses`,
-            invite.uses
-          );
-        }
-      });
-    });
-    guild = client.guilds.cache.get("926465898582253618");
-
-    guild.invites
-      .fetch()
-      .then((inv) => {
-        return new Promise((mayor_resolve) => {
-          inv.forEach((invi) => {
-            // isAIgnoredId(invi).then((result) => {
-            //   if (result == false) {
-
-            let ishHigher = false;
-            uses = invites_db.obtener(
-              `${invi.guild.id}.${invi.inviter.id}.complete_codes.${invi.code}`
-            );
-
-            uses.then(function (result) {
-              if (result.uses + 1 == invi.uses) {
-                mayor_resolve(invi);
-              }
-              if (result.uses + 1 < invi.uses) {
-                invites_db.establecer(
-                  `${invi.guild.id}.${invi.inviter.id}.complete_codes.${invi.code}.uses`,
-                  invi.uses - 1
-                );
-                mayor_resolve(invi);
-              }
-            });
-            //   }
-            // });
-          });
-        });
-      })
-      .then((mayor_data) => {
-        if (mayor_data != undefined) {
-          newUser(member, mayor_data, channel);
-        }
-      });
+    if (usedinvite != undefined) {
+      newUser(member, usedinvite, differenscesInInvi, channel);
+    }
   });
   return undefined;
 });
 
-async function newUser(member, invite, channel) {
-  // console.log(invite);
-  // console.log("entre");
-  channel.send(
-    `${member.user.tag} joined using invite code ${invite.code} from ${invite.inviter.tag}.`
-  );
+function addLostInvites() {
+  return new Promise((resolve) => {
+    client.guilds.fetch(`${sonsOfGodsGuild}`).then((g) => {
+      g.invites.fetch().then((guildInvites) => {
+        guildInvites.each((invite) => {
+          let isInTheList = false;
+          //basically a for loop over the invites:
+          if (!invites_db.tiene(`${invite.guild.id}.${invite.inviterId}`)) {
+            invites_db.establecer(`${invite.guild.id}.${invite.inviterId}`, {
+              user: invite.inviter.username,
+              userId: invite.inviter.id,
+              gests: [],
+              validInvites: 0,
+              codes: [invite.code],
+              complete_codes: {
+                [invite.code]: {
+                  uses: 0,
+                },
+              },
+            });
+          }
 
-  // isAIgnoredId(invite).then((result) => {
-  //   if (result == false) {
+          codes = invites_db.obtener(
+            `${invite.guild.id}.${invite.inviter.id}.codes`
+          );
+
+          codes.then(function (result) {
+            res = result;
+            for (let i = 0; i < res.length && isInTheList == false; i++) {
+              if (res[i] == invite.code) isInTheList = true;
+            }
+            if (!isInTheList) {
+              invites_db.push(
+                `${invite.guild.id}.${invite.inviter.id}.codes`,
+                invite.code
+              );
+              invites_db.establecer(
+                `${invite.guild.id}.${invite.inviter.id}.complete_codes.${invite.code}.uses`,
+                invite.uses
+              );
+            }
+          });
+        });
+      });
+    });
+    resolve(true);
+  });
+}
+
+function newUsedInvites(member, channel) {
+  return new Promise((mayor_resolve) => {
+    guild = client.guilds.cache.get("926465898582253618");
+
+    guild.invites.fetch().then((inv) => {
+      inv.forEach((invi) => {
+        uses = invites_db.obtener(
+          `${invi.guild.id}.${invi.inviter.id}.complete_codes.${invi.code}`
+        );
+        let isFromGods = false;
+        uses.then(function (result) {
+          if (result.uses + 1 == invi.uses) {
+            for (let i = 0; i < config.ignoredIds.length; i++) {
+              if (invi.inviter.id === config.ignoredIds[i].id) {
+                channel.send(
+                  `${member.user.tag} joined using master code ${invi.code} from THE GODS.`
+                );
+                isFromGods = true;
+              }
+            }
+            if (isFromGods == false) {
+                channel.send(
+                  `${member.user.tag} joined using master code ${invi.code} from ${invi.inviter.tag}.`
+                );
+              
+            }
+            mayor_resolve(invi);
+          }
+          if (result.uses + 1 < invi.uses) {
+            for (let i = 0; i < config.ignoredIds.length; i++) {
+              if (invi.inviter.id === config.ignoredIds[i].id) {
+                channel.send(
+                  `${member.user.tag} joined using master code ${invi.code} from THE GODS.`
+                );
+                isFromGods = true;
+              }
+            }
+            if (isFromGods == false) {
+                channel.send(
+                  `${member.user.tag} joined using master code ${invi.code} from ${invi.inviter.tag}.`
+                );
+              
+            }
+            invites_db.establecer(
+              `${invi.guild.id}.${invi.inviter.id}.complete_codes.${invi.code}.uses`,
+              invi.uses - 1
+            );
+            mayor_resolve(invi);
+          }
+        });
+      });
+    });
+  });
+}
+
+async function newUser(member, invite) {
   let guests = invites_db.obtener(
     `${invite.guild.id}.${invite.inviter.id}.gests`
   );
@@ -297,8 +294,6 @@ async function newUser(member, invite, channel) {
           });
       }
     });
-  //   }
-  // });
 }
 
 async function getLevelOfWL(message) {

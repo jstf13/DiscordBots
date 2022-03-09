@@ -11,7 +11,7 @@
       ],
       "complete_codes": {
         "4ehGja75": {
-          "uses": 6
+          "uses": 0
         },
         "5mDRHfap": {
           "uses": 0
@@ -21,16 +21,14 @@
     "426072100265000961": {
       "user": "jstf13",
       "userId": "426072100265000961",
-      "gests": [
-        "303699149759447041"
-      ],
-      "validInvites": 1,
+      "gests": [],
+      "validInvites": 0,
       "codes": [
         "7rygMzJC"
       ],
       "complete_codes": {
         "7rygMzJC": {
-          "uses": 7
+          "uses": 0
         }
       }
     },

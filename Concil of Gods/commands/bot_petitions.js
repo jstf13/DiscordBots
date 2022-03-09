@@ -187,7 +187,8 @@ client.on("message", async (message) => {
                     .addField("Regla 2 - No avisos ni ventas. ", " Este servidor no es un mercado: no pidas dinero o monedas de juegos, no intentes comprar / vender / regalar nada, ni pedirle a la gente que se una a tu servidor o comunidad de Discord. Esto incluye enviar mensajes a cualquier usuario del servidor.\n\n")
                     .addField("Regla 3 - Se respetuoso", "Debes respetar a todos los usuarios, independientemente de tu agrado hacia ellos. Trata a los demás como quieres ser tratado.\n\n")
                     .addField("Regla 4 - Sin discursos de odio ni trolling.", "El acoso, el discurso de odio, el racismo, el sexismo no están permitidos aquí. Este servidor tiene una política de tolerancia cero para dichos mensajes y es posible que se le prohíba el acceso al servidor inmediatamente sin previo aviso.\n\n")
-                    .addField(" REACCIONA CON ✅ PARA SER VERIFICADO Y ACCEDER AL SERVIDOR!!", "_");
+                    .addField(" REACCIONA CON ✅ PARA SER VERIFICADO Y ACCEDER AL SERVIDOR!!", "_")
+                    .addField(" LUEGO VE A 👅language-selector PARA ELEGIR TU IDIOMA", "_");
                 message.channel.send({ embeds: [embedDatos2] }).then(embedDatos2 => {
                     embedDatos2.react("✅");
                 });
@@ -204,7 +205,8 @@ client.on("message", async (message) => {
                     .addField("Rule 2 - No advertising or selling.", "This server is not a marketplace: do not ask for money or in-game currency, try to buy / sell / giveaway anything, or ask people to join your Discord server or community. This includes messaging any user on the server.\n\n")
                     .addField("Rule 3 - Be respectful", "You must respect all users, regardless of your liking towards them. Treat others the way you want to be treated.\n\n")
                     .addField("Rule 4 - No hate speech or trolling.", "Harassment, hate speech, racism, sexism are not allowed here. This server has a zero-tolerance policy for such messages, and you may be banned immediately without warning or recourse.\n\n")
-                    .addField(" REACT WITH ✅ TO GET VERIFIED AND HAVE ACCESS TO THE SERVER!!", "_");
+                    .addField(" REACT WITH ✅ TO GET VERIFIED AND HAVE ACCESS TO THE SERVER!!", "_")
+                    .addField(" THEN GO TO 👅language-selector TO CHOOSE YOUR LANGUAGE", "_");
                 message.channel.send({ embeds: [embedDatos7] }).then(embedDatos7 => {
                     embedDatos7.react("✅");
                 });

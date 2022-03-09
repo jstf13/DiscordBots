@@ -1,13 +1,11 @@
 const { GuildInviteManager } = require("discord.js");
 var {client} = require("../commands/commands_file")
+const config = require("../config.json");
 
 client.on('messageReactionAdd', async (reaction, user) => {
 
-    let lenguageMessage = 927573907760881665;
-    let welcomeMessage = 926960221031636993;
-
-    let spanishRol = 927215843274813510;
-    let englishRol = 927224462850523156;
+    let lenguageMessage = config.messagesIds.lenguage;
+    let welcomeMessage = config.messagesIds.wecome;
 
 	// When a reaction is received, check if the structure is partial
 	if (reaction.partial) {
@@ -35,7 +33,7 @@ client.on('messageReactionAdd', async (reaction, user) => {
         let reactedUser =  reaction.message.guild.members.cache.find(member => member.id === user.id)
         
         if (reaction.emoji.name === '🇪🇸') {
-            let commonRole = reaction.message.guild.roles.cache.get("927215843274813510");
+            let commonRole = reaction.message.guild.roles.cache.get(config.roles.spanish);
             try {
                 reactedUser.roles.add(commonRole);
              } catch {
@@ -44,7 +42,7 @@ client.on('messageReactionAdd', async (reaction, user) => {
         }
         
         if (reaction.emoji.name === '🇬🇧') {
-            let commonRole = reaction.message.guild.roles.cache.get("927224462850523156");    
+            let commonRole = reaction.message.guild.roles.cache.get(config.roles.english);    
             try {
                 reactedUser.roles.add(commonRole);
              } catch {
@@ -60,7 +58,7 @@ client.on('messageReactionRemove', (reaction, user) => {
     let welcomeMessage = 926960221031636993;
 
     if (reaction.message.id == 926960221031636993 && reaction.emoji.name === '✅') {
-        let commonRole = reaction.message.guild.roles.cache.get("926470689249189918");
+        let commonRole = reaction.message.guild.roles.cache.get(config.roles.sonOfGod);
         let reactedUser =  reaction.message.guild.members.cache.find(member => member.id === user.id)
         try {
             reactedUser.roles.remove(commonRole);
@@ -73,7 +71,7 @@ client.on('messageReactionRemove', (reaction, user) => {
         let reactedUser =  reaction.message.guild.members.cache.find(member => member.id === user.id)
         
         if (reaction.emoji.name === '🇪🇸') {
-            let commonRole = reaction.message.guild.roles.cache.get("927215843274813510");
+            let commonRole = reaction.message.guild.roles.cache.get(config.roles.spanish);
             try {
                 reactedUser.roles.remove(commonRole);
              } catch {
@@ -82,7 +80,7 @@ client.on('messageReactionRemove', (reaction, user) => {
         }
         
         if (reaction.emoji.name === '🇬🇧') {
-            let commonRole = reaction.message.guild.roles.cache.get("927224462850523156");   
+            let commonRole = reaction.message.guild.roles.cache.get(config.roles.english);   
             try {
                 reactedUser.roles.remove(commonRole);
              } catch {

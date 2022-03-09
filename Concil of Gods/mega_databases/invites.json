@@ -6,28 +6,10 @@
       "gests": [],
       "validInvites": 0,
       "codes": [
-        "HNhNsN2Mvm",
-        "7rygMzJC"
+        "HNhNsN2Mvm"
       ],
       "complete_codes": {
-        "7rygMzJC": {
-          "uses": 0
-        },
         "HNhNsN2Mvm": {
-          "uses": 0
-        }
-      }
-    },
-    "303699149759447041": {
-      "user": "burrito",
-      "userId": "303699149759447041",
-      "gests": [],
-      "validInvites": 0,
-      "codes": [
-        "KCKV2Fwm"
-      ],
-      "complete_codes": {
-        "KCKV2Fwm": {
           "uses": 0
         }
       }

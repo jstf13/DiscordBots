@@ -62,8 +62,6 @@ function promoteToWL(invite) {
 }
 
 client.on("inviteCreate", (invite) => {
-  // isAIgnoredId(invite).then((result) => {
-  // if (result == false) {
   if (!invites_db.tiene(invite.guild.id))
     invites_db.establecer(invite.guild.id, {});
   if (!invites_db.tiene(`${invite.guild.id}.${invite.inviterId}`)) {
@@ -89,8 +87,6 @@ client.on("inviteCreate", (invite) => {
       0
     );
   }
-  //    }
-  //  });
 });
 
 function removeUnusedInvites() {

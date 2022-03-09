@@ -33,7 +33,7 @@ client.on('messageReactionAdd', async (reaction, user) => {
         let reactedUser =  reaction.message.guild.members.cache.find(member => member.id === user.id)
         
         if (reaction.emoji.name === '🇪🇸') {
-            let commonRole = reaction.message.guild.roles.cache.get("927215843274813510");
+            let commonRole = reaction.message.guild.roles.cache.get(config.roles.spanish);
             try {
                 reactedUser.roles.add(commonRole);
              } catch {
@@ -42,7 +42,7 @@ client.on('messageReactionAdd', async (reaction, user) => {
         }
         
         if (reaction.emoji.name === '🇬🇧') {
-            let commonRole = reaction.message.guild.roles.cache.get("927224462850523156");    
+            let commonRole = reaction.message.guild.roles.cache.get(config.roles.english);    
             try {
                 reactedUser.roles.add(commonRole);
              } catch {

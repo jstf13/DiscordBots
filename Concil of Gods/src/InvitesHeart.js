@@ -58,7 +58,7 @@ function promoteToWL(invite) {
             userToAddRole.roles.add(WLRole);
             addUserToWLDataBase(userToAddRole).then((wasAdded) => {
               if (wasAdded) {
-                promotedToWLMessage(message);
+                promotedToWLMessage(invite);
               }
             })
           }
@@ -294,7 +294,7 @@ function promotedToWLMessage(invite) {
   const embed = new Discord.MessageEmbed()
     .setColor("YELLOW")
     .setDescription(
-      `<@${invite.inviter.id}> congratulations you just earned a place in the White List!`
+      `<@${invite.inviter.id}> Congratulations, you have just received a place on the White List!`
     );
   channelToSend.send({ embeds: [embed] });
 }

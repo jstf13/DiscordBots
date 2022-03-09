@@ -55,7 +55,7 @@ function promotedToWLMessage(message) {
   const embed = new Discord.MessageEmbed()
     .setColor("YELLOW")
     .setDescription(
-      `${message.member} congratulations you just earned a place in the White List!`
+      `${message.member} Congratulations, you have just received a place on the White List!`
     );
   channelToSend.send({ embeds: [embed] });
 }

@@ -2,5 +2,31 @@
     "PROJECT_ADDRESS": "GG39qacSqDotNSQyzsLf5nqGxqF6yVo1qWnBCkKhwhuE",
     "DISCORD_URL": "https://discord.com/api/webhooks/934157143471427645/HIkoOb3-YVQw1eSrme4Kl8fGbkXuuN_3edogXVLNHFZhxzAA3KXni-ea38uHsYUbgstX",  
     "token": "OTM0MTcyNjMyNTQxMTY3NjU2.YesODw.2gMMS7-Zb4Prvxhlk7av_bnEUdw",
-    "prefix": "_"   
+    "prefix": "_",
+    "serverIds": {
+        "sonsOfGodsGuildId": "926465898582253618"
+    },
+    "channelsIds": {
+        "welcomeChannel": "951245034475376651",
+        "levelChannel": "951245083791986729",
+        "totalMembes": "937133345932980224",
+        "totalWlMembers": "951511019207938218"
+    },
+    "roles": {
+        "wlRole": "937127841592651786",
+        "touchedByGods": "951242381741686854",
+        "spanish": "927215843274813510",
+        "english": "927224462850523156",
+        "sonOfGod": "926470689249189918"
+    },
+    "botChannels": [
+        "951244592576090133",
+        "951244688717934622",
+        "926489224541257748"
+    ],
+    "messagesIds": {
+        "lenguage": "951197344416821330",
+        "welcome": "951216653318897664",
+        "welcomeES": "951216663947251762"
+    }
 }

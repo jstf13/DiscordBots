@@ -77,7 +77,7 @@ const runSalesBot = async () => {
         }
     }
 }
-runSalesBot();
+//runSalesBot();
 
 const printSalesInfo = (date, price, signature, title, marketplace, imageURL) => {
     console.log("-------------------------------------------")

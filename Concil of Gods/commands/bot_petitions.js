@@ -216,6 +216,7 @@ client.on("message", async (message) => {
         });
         message.react.tick;
         break;
+
       case "embedwelcome-english":
         const embedDatos7 = new Discord.MessageEmbed()
           .setTitle("RULES:")
@@ -255,6 +256,62 @@ client.on("message", async (message) => {
         });
         message.react.tick;
         break;
+
+      case "oficial-links":
+        const embedDatos10 = new Discord.MessageEmbed()
+          .setTitle("LINKS:")
+          .setAuthor(client.user.username, client.user.displayAvatarURL())
+          .setColor(0x00ae86)
+          .setFooter(
+            "These are the links provided by the gods.",
+            client.user.avatarURL()
+          )
+          .setTimestamp()
+          .addField("WEBSITE", "https://sonsofgods.io/")
+          .addField("TWITTER", "https://twitter.com/sonsofgodsnft")
+          .addField("INSTAGRAM", "https://www.instagram.com/sonsofgodsnft/");
+        message.channel
+          .send({ embeds: [embedDatos10] })
+          .then((embedDatos10) => {
+            embedDatos10.react("✅");
+          });
+        message.react.tick;
+        break;
+
+      case "oficial-artist-links-es":
+        const embedDatos11 = new Discord.MessageEmbed()
+          .setTitle("ARTIST LINKS:")
+          .setAuthor(client.user.username, client.user.displayAvatarURL())
+          .setColor(0x00ae86)
+          .setFooter(
+            "These are the links of our best artist.",
+            client.user.avatarURL()
+          )
+          .setTimestamp()
+          .addField(
+            "INSTAGRAM",
+            "https://www.instagram.com/traficantedearte8/"
+          );
+        message.channel
+          .send({ embeds: [embedDatos11] })
+          .then((embedDatos11) => {
+            embedDatos11.react("🧙");
+          });
+        message.react.tick;
+        break;
+
+      case "portfolio_mauri_1":
+        message.channel.send({
+          files: [
+            "images/portfolio-1_1.jpg",
+            "images/portfolio-1_2.jpg",
+            "images/portfolio-1_3.jpg",
+            "images/portfolio-1_4.jpg",
+            "images/portfolio-1_5.jpg",
+          ],
+        });
+        break;
+
       case "embedlenguage":
         const embedDatos3 = new Discord.MessageEmbed()
           .setTitle("SELECT YOUR LANGUAGE")
@@ -395,15 +452,11 @@ client.on("message", async (message) => {
         message.react.tick;
         break;
       case "lore1":
-        client.on("messageCreate", (message) => {
           message.channel.send({ files: ["images/lore1.png"] });
-        });
         break;
 
       case "lore2":
-        client.on("messageCreate", (message) => {
           message.channel.send({ files: ["images/lore2.png"] });
-        });
         break;
 
       case "embedfaq-spanish":

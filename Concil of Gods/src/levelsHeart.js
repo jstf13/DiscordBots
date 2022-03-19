@@ -28,7 +28,7 @@ function promoteToWL(message) {
   );
 
   getNeededIvnitesOfWL().then((neededInvitesOfWL) => {
-    if (neededInvitesOfWL == 0) {
+    if (neededInvitesOfWL == 1) {
       userToAddRole.roles.add(WLRole);
       addUserToWLDataBase(userToAddRole).then((wasAdded) => {
         if (wasAdded) {

@@ -98,6 +98,52 @@ client.on("message", async (message) => {
         }
         break;
 
+      case "invites-from":
+        try {
+          const args = message.content.slice(prefix.length + comand.length).trim().split(/ +/g);
+          const domain = args.shift().toLocaleLowerCase();
+            console.log(domain);
+          
+          let valInvites;
+          let inv = invites_db
+            .find(
+              `${message.guild.id}`,
+              (thisUser) => thisUser.userId === domain
+            )
+            .then((thisUser) => {
+              console.log(thisUser);
+              if (!thisUser) {
+                valInvites = 0;
+              } else {
+                valInvites = thisUser.validInvites;
+              }
+
+              const embedDatosInv = new Discord.MessageEmbed()
+                .setTitle(
+                  "We the concil of gods have all the control in these server and your invitations are:"
+                )
+                .setAuthor(
+                  thisUser.user,
+                )
+                .setColor(0x00ae86)
+
+                .addField(
+                  "-------------------- \n ✅ Total valid invites -> " +
+                    valInvites,
+                  "--------------------"
+                )
+                .setFooter("Message from the concil", client.user.avatarURL());
+              message.channel.send({ embeds: [embedDatosInv] });
+              message.author.react;
+            });
+          if (inv === undefined) {
+            console.log("undefined");
+          }
+        } catch (error) {
+          console.log(error);
+        }
+        break;
+
       case "mejorvideo":
         let best = new Discord.MessageEmbed()
           //.setAuthor(user.username, user.displayAvatarURL())
@@ -374,6 +420,7 @@ client.on("message", async (message) => {
           .addField("Grupo VIP", "150 lugares VIP designados manualmente.");
         message.channel.send({ embeds: [embedDatos9] });
         break;
+
       case "embedwlrules":
         const embedDatos8 = new Discord.MessageEmbed()
           .setTitle("WHITELIST")
@@ -451,12 +498,13 @@ client.on("message", async (message) => {
         });
         message.react.tick;
         break;
+
       case "lore1":
-          message.channel.send({ files: ["images/lore1.png"] });
+        message.channel.send({ files: ["images/lore1.png"] });
         break;
 
       case "lore2":
-          message.channel.send({ files: ["images/lore2.png"] });
+        message.channel.send({ files: ["images/lore2.png"] });
         break;
 
       case "embedfaq-spanish":
@@ -500,6 +548,88 @@ client.on("message", async (message) => {
         message.channel.send({ embeds: [embedDatos5] }).then((embedDatos5) => {
           embedDatos5.react("🔥");
         });
+        message.react.tick;
+        break;
+
+      case "how-to-buy":
+        const embedDatos13 = new Discord.MessageEmbed()
+          .setTitle("🔥  HOW TO MINT  🔥")
+          .setAuthor(client.user.username, client.user.displayAvatarURL())
+          .setColor("DARK_GOLD")
+          .setFooter(
+            "This is an important message from the gods.",
+            client.user.avatarURL()
+          )
+          .setTimestamp()
+          .addField(
+            "1. Buy SOL from an exchange",
+            "Binance, FTX, Coinbase, Kraken, Huobi, Bitfinex, etc. 💳 (preferably use a known exchange like the ones mentioned)"
+          )
+          .addField(
+            "2. Install a SOL wallet ☀️ (We recommend Phantom Wallet)",
+            "https://phantom.app/"
+          )
+          .addField(
+            "3. Fund your wallet",
+            "Transfer SOL from exchange to the wallet. Fees are low on Solana but are not zero. Add 0.02 SOL for each NFT you plan on buying."
+          )
+          .addField(
+            "🚫 BEWARE OF SCAMS",
+            "Ignore or block all DMs. Scammers will send you DMs trying to get you to mint on their fake sites, don't do that. \n" +
+              "If you see something like this report us in <#936805131423473665> at the end of the server"
+          )
+          .addField(
+            "Links",
+            "The official links will only be shared in <#936003409235030048> and <#936003808700551188> channels"
+          );
+        message.channel
+          .send({ embeds: [embedDatos13] })
+          .then((embedDatos13) => {
+            embedDatos13.react("🚀");
+          });
+        message.react.tick;
+        break;
+
+      case "progressbar":
+        message.channel.send(progressBar(99, 100, 10));
+        break;
+
+      case "como-comprar":
+        const embedDatos14 = new Discord.MessageEmbed()
+          .setTitle("🔥  COMO MINTEAR  🔥")
+          .setAuthor(client.user.username, client.user.displayAvatarURL())
+          .setColor("DARK_GOLD")
+          .setFooter(
+            "Este es un mensaje sumamente importante de los dioses.",
+            client.user.avatarURL()
+          )
+          .setTimestamp()
+          .addField(
+            "1. Compra solana en algun exchange",
+            "Binance, FTX, Coinbase, Kraken, Huobi, Bitfinex, etc. 💳 (Preferentemente compra en un exchange conocido como los mencionados)"
+          )
+          .addField(
+            "2. Instala una cartera para solana ☀️ (Recomendamos Phantom Wallet)",
+            "https://phantom.app/"
+          )
+          .addField(
+            "3. Carga tu cartera",
+            "Transfiera SOL del exchange a la billetera. Los fees son bajos en Solana pero no son cero. Agregue 0.02 SOL por cada NFT que planee comprar."
+          )
+          .addField(
+            "🚫 CUIDADO CON LOS SCAMMERS",
+            "Ignora o bloquea todos los DM. Los estafadores te enviarán mensajes directos tratando de que hagas mint en sus sitios falsos, no hagas eso. \n" +
+              "Si ve algo como esto, infórmanos en <#936805131423473665> al final del servidor"
+          )
+          .addField(
+            "Links",
+            "Los links oficiales solo se comprartiran en <#936003409235030048> y <#936003808700551188>"
+          );
+        message.channel
+          .send({ embeds: [embedDatos14] })
+          .then((embedDatos14) => {
+            embedDatos14.react("🚀");
+          });
         message.react.tick;
         break;
 

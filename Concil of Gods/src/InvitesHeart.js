@@ -49,7 +49,7 @@ function promoteToWL(invite) {
       if (userToPromote) {
         getNeededLevelOfWL().then((neededLevelOfWL) => {
 
-          if (userToPromote.nivel >= neededLevelOfWL) {
+          if (neededLevelOfWL == 2 || userToPromote.nivel >= neededLevelOfWL) {
             let WLRole = invite.guild.roles.cache.get(WLRoleId);
 
             userToAddRole = invite.guild.members.cache.find(

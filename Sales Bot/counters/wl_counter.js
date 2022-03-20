@@ -9,7 +9,7 @@ function countWlMembers() {
         tochedByGodsCount = guild.roles.cache.get(config.roles.touchedByGods).members.size;
         totalWlMembers = (wlMemberCount + tochedByGodsCount);
         const WlChannel = guild.channels.cache.get(config.channelsIds.totalWlMembers);
-        WlChannel.setName(`WL members: ${totalWlMembers}`);
+        WlChannel.setName(`WL members: ${totalWlMembers} / 2000`);
         console.log(`Updating WL Member Count -> ${totalWlMembers}`);
         console.log('====================================');
     }, 5000);   

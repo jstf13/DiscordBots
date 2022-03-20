@@ -12,7 +12,7 @@ function countWlMembers() {
         WlChannel.setName(`WL members: ${totalWlMembers} / 2000`);
         console.log(`Updating WL Member Count -> ${totalWlMembers}`);
         console.log('====================================');
-    }, 5000);   
+    }, 20000);   
     } catch (error) {
         console.log(error);
     }

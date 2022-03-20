@@ -9,7 +9,7 @@ function countMembers() {
         const channel = guild.channels.cache.get(config.channelsIds.totalMembes);
         channel.setName(`Total Members: ${memberCount}`);
         console.log(`Updating Member Count -> ${memberCount}`);
-    }, 5000);   
+    }, 20000);   
     } catch (error) {
         console.log(error);
     }

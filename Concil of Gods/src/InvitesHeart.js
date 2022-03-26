@@ -145,13 +145,10 @@ client.on("guildMemberAdd", async (member) => {
   let commonRole = guild.roles.cache.get(
     config.roles.sonOfGod
   );
-  // let reactedUser = reaction.message.guild.members.cache.find(
-  //   (member) => member.id === user.id
-  // );
   member.roles.add(commonRole);
 
   const channel = member.guild.channels.cache.find(
-    (channel) => channel.id === config.channelsIds.botTestChannel
+    (channel) => channel.id === config.channelsIds.welcomeChannel
   );
   newUsedInvites(member, channel).then((usedinvite, differenscesInInvi) => {
     if (usedinvite != undefined) {

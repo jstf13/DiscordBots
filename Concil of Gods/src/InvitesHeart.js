@@ -138,6 +138,18 @@ function removeUnusedInvites() {
 }
 
 client.on("guildMemberAdd", async (member) => {
+
+  
+  guild = client.guilds.cache.get(config.serverIds.sonsOfGodsGuildId);
+
+  let commonRole = guild.roles.cache.get(
+    config.roles.sonOfGod
+  );
+  // let reactedUser = reaction.message.guild.members.cache.find(
+  //   (member) => member.id === user.id
+  // );
+  member.roles.add(commonRole);
+
   const channel = member.guild.channels.cache.find(
     (channel) => channel.id === config.channelsIds.botTestChannel
   );

@@ -8,7 +8,8 @@
     },
     "channelsIds": {
         "welcomeChannel": "951245034475376651",
-        "levelChannel": "951245083791986729"
+        "levelChannel": "951245083791986729",
+        "botTestChannel": "926489224541257748"
     },
     "roles": {
         "wlRole": "937127841592651786",

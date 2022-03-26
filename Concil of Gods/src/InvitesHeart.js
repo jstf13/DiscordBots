@@ -33,38 +33,47 @@ function cleanBddOnceADay() {
     millisTill10 += 86400000; // it's after 10am, try 10am tomorrow.
   }
   setTimeout(function () {
-  removeUnusedInvites();
+    removeUnusedInvites();
+    addNewPeopleTheTeamAddToWL();
   }, millisTill10);
 }
 
 function promoteToWL(invite) {
   let userToPromote;
-  level_db
-    .find(`${invite.guild.id}`, (thisUser) => {
-      if (thisUser.userId == invite.inviter.id) {
-        userToPromote = thisUser;
-      }
-    })
-    .then((thisUser) => {
-      if (userToPromote) {
-        getNeededLevelOfWL().then((neededLevelOfWL) => {
+  let WLRole = invite.guild.roles.cache.get(WLRoleId);
 
+  userToAddRole = invite.guild.members.cache.find(
+    (thisMember) => thisMember.id === invite.inviter.id
+  );
+
+  getNeededLevelOfWL().then((neededLevelOfWL) => {
+    if (neededLevelOfWL == 2) {
+      userToAddRole.roles.add(WLRole);
+      addUserToWLDataBase(userToAddRole).then((wasAdded) => {
+        if (wasAdded) {
+          promotedToWLMessage(invite);
+        }
+      });
+    }
+    level_db
+      .find(`${invite.guild.id}`, (thisUser) => {
+        if (thisUser.userId == invite.inviter.id) {
+          userToPromote = thisUser;
+        }
+      })
+      .then((thisUser) => {
+        if (userToPromote) {
           if (neededLevelOfWL == 2 || userToPromote.nivel >= neededLevelOfWL) {
-            let WLRole = invite.guild.roles.cache.get(WLRoleId);
-
-            userToAddRole = invite.guild.members.cache.find(
-              (thisMember) => thisMember.id === invite.inviter.id
-            );
             userToAddRole.roles.add(WLRole);
             addUserToWLDataBase(userToAddRole).then((wasAdded) => {
               if (wasAdded) {
                 promotedToWLMessage(invite);
               }
-            })
+            });
           }
-        });
-      }
-    });
+        }
+      });
+  });
 }
 
 client.on("inviteCreate", (invite) => {
@@ -130,7 +139,7 @@ function removeUnusedInvites() {
 
 client.on("guildMemberAdd", async (member) => {
   const channel = member.guild.channels.cache.find(
-    (channel) => channel.id === config.channelsIds.welcomeChannel
+    (channel) => channel.id === config.channelsIds.botTestChannel
   );
   newUsedInvites(member, channel).then((usedinvite, differenscesInInvi) => {
     if (usedinvite != undefined) {
@@ -363,29 +372,57 @@ async function getNeededLevelOfWL() {
 
 async function getNeededIvnitesOfWL() {
   return new Promise((resolve) => {
-    wl_db
-      .obtener(`${myGuildId}.wl_members`)
-      .then(function (amounOfWlPeople) {
-        if (amounOfWlPeople <= 150) {
-          resolve(config.levels.level_1.invites);
-        }
-        if (amounOfWlPeople <= 500) {
-          resolve(config.levels.level_2.invites);
-        }
-        if (amounOfWlPeople <= 950) {
-          resolve(config.levels.level_3.invites);
-        }
-        if (amounOfWlPeople <= 1400) {
-          resolve(config.levels.level_4.invites);
-        }
-        if (amounOfWlPeople <= 1750) {
-          resolve(config.levels.level_5.invites);
-        }
-      });
+    wl_db.obtener(`${myGuildId}.wl_members`).then(function (amounOfWlPeople) {
+      if (amounOfWlPeople <= 150) {
+        resolve(config.levels.level_1.invites);
+      }
+      if (amounOfWlPeople <= 500) {
+        resolve(config.levels.level_2.invites);
+      }
+      if (amounOfWlPeople <= 950) {
+        resolve(config.levels.level_3.invites);
+      }
+      if (amounOfWlPeople <= 1400) {
+        resolve(config.levels.level_4.invites);
+      }
+      if (amounOfWlPeople <= 1750) {
+        resolve(config.levels.level_5.invites);
+      }
+    });
   });
 }
 
 /*---Close Level zone ---*/
+
+function addNewPeopleTheTeamAddToWL() {
+  console.log("================================================");
+  console.log("Adding to wl db the people who the team added today");
+  console.log("================================================");
+  client.guilds.fetch(`${myGuildId}`).then((g) => {
+    const WLUsers = g.roles.cache
+      .get(config.roles.wlRole)
+      .members.map((m) => m.user);
+
+    wl_db.establecer(`${myGuildId}.wl_members`, WLUsers.length);
+
+    for (let i = 0; i < WLUsers.length; i++) {
+      let courrentUser = WLUsers[i];
+      wl_db
+        .find(`${myGuildId}`, (thisUser) => thisUser.userId == courrentUser.id)
+        .then((thisUser) => {
+          if (!thisUser) {
+            wl_db.establecer(`${myGuildId}.${courrentUser.id}`, {
+              name: `${courrentUser.tag}`,
+              userId: `${courrentUser.id}`,
+            });
+          }
+        });
+    }
+  });
+  console.log("================================================");
+  console.log("All new people added to wl db");
+  console.log("================================================");
+}
 
 // TEST FUNCTIONS //
 

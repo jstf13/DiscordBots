@@ -8,12 +8,14 @@ let invites_db = new db.crearDB("invites");
 const config = require("../config.json");
 
 var prefix = config.prefix;
+var giveawayPrefix = '!g';
 
 client.on("message", async (message) => {
   const args = message.content.slice(prefix.length).trim().split(/ +/g);
   const comand = args.shift().toLocaleLowerCase();
   var botChannels = config.botChannels;
 
+  if (message.content.startsWith(giveawayPrefix)) return;
   if (!message.content.startsWith(prefix)) return;
   if (message.author.bot) return;
   const spanishRol = config.roles.spanish;

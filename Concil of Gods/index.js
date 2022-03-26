@@ -6,7 +6,7 @@ const { Message } = require("discord.js");
 require("./commands/bot_petitions");
 require("./src/reactions");
 require("./src/moderator");
-require("./src/invitesHeart");
+require("./src/InvitesHeart");
 require('./src/levelsHeart');
 
 

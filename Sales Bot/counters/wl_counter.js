@@ -5,13 +5,22 @@ function countWlMembers() {
     try {
     const guild = client.guilds.cache.get(config.serverIds.sonsOfGodsGuildId);
     setInterval(() =>{
+        glMemberCount = guild.roles.cache.get(config.roles.glRole).members.size;
         wlMemberCount = guild.roles.cache.get(config.roles.wlRole).members.size;
         tochedByGodsCount = guild.roles.cache.get(config.roles.touchedByGods).members.size;
+        
         totalWlMembers = (wlMemberCount + tochedByGodsCount);
+        
         const WlChannel = guild.channels.cache.get(config.channelsIds.totalWlMembers);
         WlChannel.setName(`WL members: ${totalWlMembers} / 2000`);
-        console.log(`Updating WL Member Count -> ${totalWlMembers}`);
-        console.log('====================================');
+
+        const glChannel = guild.channels.cache.get(config.channelsIds.totalGlMembers);
+        glChannel.setName(`GOLD LIST: ${glMemberCount} / 100`);
+        
+        
+        // console.log(`Updating wl Member Count -> ${totalWlMembers}`);
+        // console.log(`Updating GL Member Count -> ${glMemberCount}`);
+        // console.log('====================================');
     }, 20000);   
     } catch (error) {
         console.log(error);

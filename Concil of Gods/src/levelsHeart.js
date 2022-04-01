@@ -116,7 +116,11 @@ client.on("message", async (message) => {
       .setDescription(
         `${message.member} acabas de subir de nivel: ${parseInt(nivel + 1)}!`
       );
-    channelToSend.send({ embeds: [embed] });
+    if (channelToSend != undefined) {
+      channelToSend.send({ embeds: [embed] });
+    } else {
+      console.log(message.author.id + "level_up -> bot dont send te message");
+    }
 
     getNeededLevelOfWL().then((levelOfWL) => {
       if (nivel + 1 >= levelOfWL) {

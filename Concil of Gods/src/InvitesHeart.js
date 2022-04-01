@@ -19,6 +19,7 @@ client.on("ready", () => {
     wl_db.establecer(myGuildId, {
       wl_members: 0,
     });
+  addEnglishRoleToAllHowDontChooseOne();
   addLostInvites();
   // addItemsForInvites_db(100);
   cleanBddOnceADay();
@@ -27,7 +28,7 @@ client.on("ready", () => {
 function cleanBddOnceADay() {
   var now = new Date();
   var millisTill10 =
-    new Date(now.getFullYear(), now.getMonth(), now.getDate(), 3, 30, 0, 0) -
+    new Date(now.getFullYear(), now.getMonth(), now.getDate(), 23, 25, 0, 0) -
     now;
   if (millisTill10 < 0) {
     millisTill10 += 86400000; // it's after 10am, try 10am tomorrow.
@@ -138,13 +139,9 @@ function removeUnusedInvites() {
 }
 
 client.on("guildMemberAdd", async (member) => {
-
-  
   guild = client.guilds.cache.get(config.serverIds.sonsOfGodsGuildId);
 
-  let commonRole = guild.roles.cache.get(
-    config.roles.sonOfGod
-  );
+  let commonRole = guild.roles.cache.get(config.roles.sonOfGod);
   member.roles.add(commonRole);
 
   const channel = member.guild.channels.cache.find(
@@ -431,6 +428,25 @@ function addNewPeopleTheTeamAddToWL() {
   console.log("================================================");
   console.log("All new people added to wl db");
   console.log("================================================");
+}
+
+function addEnglishRoleToAllHowDontChooseOne() {
+  guild = client.guilds.cache.get(config.serverIds.sonsOfGodsGuildId);
+  const role = guild.roles.fetch(config.roles.sonOfGod);
+  guild.members.cache
+    .filter((member) =>
+      member.roles.cache.find((role) => role.id == config.roles.sonOfGod)
+    )
+    .filter((member) =>
+      member.roles.cache.find((role) => {
+        if (role.id == config.roles.sonOfGod) {
+          return;
+        }
+      })
+    )
+    .forEach((m) => {
+      console.log(m.user.username);
+    });
 }
 
 // TEST FUNCTIONS //

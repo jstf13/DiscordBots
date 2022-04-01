@@ -8,7 +8,7 @@ let invites_db = new db.crearDB("invites");
 const config = require("../config.json");
 
 var prefix = config.prefix;
-var giveawayPrefix = '!g';
+var giveawayPrefix = "!g";
 
 client.on("message", async (message) => {
   const args = message.content.slice(prefix.length).trim().split(/ +/g);
@@ -102,10 +102,13 @@ client.on("message", async (message) => {
 
       case "invites-from":
         try {
-          const args = message.content.slice(prefix.length + comand.length).trim().split(/ +/g);
+          const args = message.content
+            .slice(prefix.length + comand.length)
+            .trim()
+            .split(/ +/g);
           const domain = args.shift().toLocaleLowerCase();
-            console.log(domain);
-          
+          console.log(domain);
+
           let valInvites;
           let inv = invites_db
             .find(
@@ -124,9 +127,7 @@ client.on("message", async (message) => {
                 .setTitle(
                   "We the concil of gods have all the control in these server and your invitations are:"
                 )
-                .setAuthor(
-                  thisUser.user,
-                )
+                .setAuthor(thisUser.user)
                 .setColor(0x00ae86)
 
                 .addField(
@@ -146,6 +147,29 @@ client.on("message", async (message) => {
         }
         break;
 
+      case "poll":
+        let allInvites = invites_db
+          .map(
+            config.serverIds.sonsOfGodsGuildId,
+            (v, key) => `User: ${v.user}, inv: ${v.validInvites}`
+          )
+          .then((data) => {
+            var numbers = [1, 5, 2, 30];
+            console.log(numbers);
+            console.log(
+              numbers.sort(function (a, b) {
+                return a - b;
+              })
+            );
+            console.log(
+              data.sort(function (a, b) {
+                return a.inv - b.inv;
+              })
+            );
+            var newData = [data.join("\n")]
+            console.log(newData);
+          });
+        break;
       case "mejorvideo":
         let best = new Discord.MessageEmbed()
           //.setAuthor(user.username, user.displayAvatarURL())

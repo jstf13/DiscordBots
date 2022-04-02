@@ -5,6 +5,7 @@ const db = require("megadb");
 
 let modernarray = require("modernarray");
 let invites_db = new db.crearDB("invites");
+let invites_poll_db = new db.crearDB("invites_poll");
 let level_db = new db.crearDB("levels");
 let wl_db = new db.crearDB("wl_People");
 let WLRoleId = config.roles.wlRole;
@@ -147,9 +148,9 @@ client.on("guildMemberAdd", async (member) => {
   const channel = member.guild.channels.cache.find(
     (channel) => channel.id === config.channelsIds.welcomeChannel
   );
-  newUsedInvites(member, channel).then((usedinvite, differenscesInInvi) => {
+  newUsedInvites(member, channel).then((usedinvite) => {
     if (usedinvite != undefined) {
-      newUser(member, usedinvite, differenscesInInvi, channel);
+      newUser(member, usedinvite);
     }
   });
   return undefined;
@@ -229,7 +230,12 @@ function newUsedInvites(member, channel) {
                 `${member.user.tag} joined using master code ${invi.code} from ${invi.inviter.tag}.`
               );
             }
-            mayor_resolve(invi);
+
+            // for polls
+            addInviteToPoll(invi, isFromGods);
+            //end polls
+
+            mayor_resolve(invi, isFromGods);
           }
           if (result.uses + 1 < invi.uses) {
             for (let i = 0; i < config.ignoredIds.length; i++) {
@@ -249,7 +255,12 @@ function newUsedInvites(member, channel) {
               `${invi.guild.id}.${invi.inviter.id}.complete_codes.${invi.code}.uses`,
               invi.uses - 1
             );
-            mayor_resolve(invi);
+
+            // for polls
+            addInviteToPoll(invi, isFromGods);
+            //end polls
+
+            mayor_resolve(invi, isFromGods);
           }
         });
       });
@@ -257,7 +268,7 @@ function newUsedInvites(member, channel) {
   });
 }
 
-async function newUser(member, invite) {
+async function newUser(member, invite, isFromGods) {
   let guests = invites_db.obtener(
     `${invite.guild.id}.${invite.inviter.id}.gests`
   );
@@ -344,6 +355,12 @@ client.on("guildMemberRemove", async (member) => {
               `${member.guild.id}.${thisUser.userId}.validInvites`,
               -1
             );
+
+            // for polls
+
+            removeInivteFromPoll(member, thisUser);
+
+            // end polls
           }
         }
         invites_db.establecer(
@@ -448,6 +465,36 @@ function addEnglishRoleToAllHowDontChooseOne() {
       console.log(m.user.username);
     });
 }
+
+// POLL ZONE //
+
+function addInviteToPoll(invite, isFromGods) {
+  if (!isFromGods) {
+    if (!invites_poll_db.tiene(`${invite.guild.id}.${invite.inviter.id}`)) {
+      invites_poll_db.establecer(`${invite.guild.id}.${invite.inviter.id}`, {
+        user: invite.inviter.username,
+        userId: invite.inviter.id,
+        validInvites: 1,
+      });
+    } else {
+      invites_poll_db.sumar(
+        `${invite.guild.id}.${invite.inviter.id}.validInvites`,
+        1
+      );
+    }
+  }
+}
+
+function removeInivteFromPoll(member, thisUser) {
+  if (invites_poll_db.tiene(`${member.guild.id}.${thisUser.userId}`)) {
+    invites_poll_db.sumar(
+      `${member.guild.id}.${thisUser.userId}.validInvites`,
+      -1
+    );
+  }
+}
+
+// END POLL ZONE //
 
 // TEST FUNCTIONS //
 

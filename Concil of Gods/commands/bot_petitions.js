@@ -4,6 +4,7 @@ const db = require("megadb");
 
 let levels_db = new db.crearDB("levels");
 let invites_db = new db.crearDB("invites");
+let invites_poll_db = new db.crearDB("invites_poll");
 
 const config = require("../config.json");
 
@@ -148,28 +149,38 @@ client.on("message", async (message) => {
         break;
 
       case "poll":
-        let allInvites = invites_db
-          .map(
-            config.serverIds.sonsOfGodsGuildId,
-            (v, key) => `User: ${v.user}, inv: ${v.validInvites}`
-          )
-          .then((data) => {
-            var numbers = [1, 5, 2, 30];
-            console.log(numbers);
-            console.log(
-              numbers.sort(function (a, b) {
-                return a - b;
-              })
-            );
-            console.log(
-              data.sort(function (a, b) {
-                return a.inv - b.inv;
-              })
-            );
-            var newData = [data.join("\n")]
-            console.log(newData);
-          });
+        const users = [];
+        const invites = [];
+        invites_poll_db
+          .ordenar(`${message.guild.id}`, "validInvites", "desc")
+          .then(function (params) {
+            params.map((user) => {
+              users.push(user.valor.user);
+              invites.push(user.valor.validInvites);
+            });
+          })
+          .then(() => {
+
+            let pollEmbed = new Discord.MessageEmbed().setTitle("Poll");
+            pollEmbed.setColor("GOLD");
+            pollEmbed.addField("USER","ㅤㅤ",  true);
+            pollEmbed.addField("INVITES" ,"ㅤㅤ",  true);
+            pollEmbed.addField(`ㅤㅤ`, "ㅤㅤ", true);
+
+            for (let i = 0; i < users.length && i < 5; i++) {
+              const element = users[i];
+
+              pollEmbed.addField(`${users[i]}`,"ㅤㅤ", true);
+              pollEmbed.addField(`ㅤ${invites[i]}`,"ㅤㅤ", true);
+              pollEmbed.addField(`${i+1}º`,`ㅤㅤ`, true);
+            }
+            pollEmbed.setFooter("This is the poll for the NFT competence");
+            
+            message.channel.send({ embeds: [pollEmbed] });
+          })
+          .catch(console.error);
         break;
+
       case "mejorvideo":
         let best = new Discord.MessageEmbed()
           //.setAuthor(user.username, user.displayAvatarURL())

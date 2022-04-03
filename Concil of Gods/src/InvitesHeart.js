@@ -148,10 +148,13 @@ client.on("guildMemberAdd", async (member) => {
   const channel = member.guild.channels.cache.find(
     (channel) => channel.id === config.channelsIds.welcomeChannel
   );
-  newUsedInvites(member, channel).then((usedinvite) => {
-    if (usedinvite != undefined) {
-      newUser(member, usedinvite);
-    }
+  newUsedInvites(member, channel).then((dataArray) => {
+    dataArray.forEach((dataArray) => {
+      addInviteToPoll(dataArray.inv, dataArray.isFromGods);
+      if (dataArray.inv != undefined) {
+        newUser(member, dataArray.inv);
+      }
+    });
   });
   return undefined;
 });
@@ -231,11 +234,7 @@ function newUsedInvites(member, channel) {
               );
             }
 
-            // for polls
-            addInviteToPoll(invi, isFromGods);
-            //end polls
-
-            mayor_resolve(invi, isFromGods);
+            mayor_resolve([{ inv: invi, isFromGods: isFromGods }]);
           }
           if (result.uses + 1 < invi.uses) {
             for (let i = 0; i < config.ignoredIds.length; i++) {
@@ -256,11 +255,7 @@ function newUsedInvites(member, channel) {
               invi.uses - 1
             );
 
-            // for polls
-            addInviteToPoll(invi, isFromGods);
-            //end polls
-
-            mayor_resolve(invi, isFromGods);
+            mayor_resolve([{ inv: invi, isFromGods: isFromGods }]);
           }
         });
       });
@@ -268,7 +263,7 @@ function newUsedInvites(member, channel) {
   });
 }
 
-async function newUser(member, invite, isFromGods) {
+async function newUser(member, invite) {
   let guests = invites_db.obtener(
     `${invite.guild.id}.${invite.inviter.id}.gests`
   );
@@ -486,6 +481,9 @@ function addInviteToPoll(invite, isFromGods) {
 }
 
 function removeInivteFromPoll(member, thisUser) {
+  console.log(
+    `${member.user.username} -> ${thisUser.userId} has left the server`
+  );
   if (invites_poll_db.tiene(`${member.guild.id}.${thisUser.userId}`)) {
     invites_poll_db.sumar(
       `${member.guild.id}.${thisUser.userId}.validInvites`,

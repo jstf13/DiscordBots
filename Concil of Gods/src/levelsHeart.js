@@ -100,7 +100,7 @@ client.on("message", async (message) => {
 
   if (xp + randomxp >= levelup) {
     let levelChannel = config.channelsIds.levelChannel;
-    if (message.member.guild != undefined) {
+    if (message.member != undefined) {
       const channelToSend = message.member.guild.channels.cache.find(
         (channel) => channel.id === levelChannel
       );

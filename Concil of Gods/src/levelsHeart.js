@@ -100,33 +100,37 @@ client.on("message", async (message) => {
 
   if (xp + randomxp >= levelup) {
     let levelChannel = config.channelsIds.levelChannel;
-    const channelToSend = message.member.guild.channels.cache.find(
-      (channel) => channel.id === levelChannel
-    );
-
-    levels_db.establecer(`${message.guild.id}.${message.author.id}`, {
-      userId: message.author.id,
-      xp: 0,
-      nivel: parseInt(nivel + 1),
-    });
-
-    const embed = new Discord.MessageEmbed()
-      .setColor("BLACK")
-      .setThumbnail(message.author.displayAvatarURL())
-      .setDescription(
-        `${message.member} acabas de subir de nivel: ${parseInt(nivel + 1)}!`
+    if (message.member.guild != undefined) {
+      const channelToSend = message.member.guild.channels.cache.find(
+        (channel) => channel.id === levelChannel
       );
-    if (channelToSend != undefined) {
-      channelToSend.send({ embeds: [embed] });
-    } else {
-      console.log(message.author.id + "level_up -> bot dont send te message");
-    }
 
-    getNeededLevelOfWL().then((levelOfWL) => {
-      if (nivel + 1 >= levelOfWL) {
-        promoteToWL(message);
+      levels_db.establecer(`${message.guild.id}.${message.author.id}`, {
+        userId: message.author.id,
+        xp: 0,
+        nivel: parseInt(nivel + 1),
+      });
+
+      const embed = new Discord.MessageEmbed()
+        .setColor("BLACK")
+        .setThumbnail(message.author.displayAvatarURL())
+        .setDescription(
+          `${message.member} acabas de subir de nivel: ${parseInt(nivel + 1)}!`
+        );
+      if (channelToSend != undefined) {
+        channelToSend.send({ embeds: [embed] });
+      } else {
+        console.log(message.author.id + "level_up -> bot dont send te message");
       }
-    });
+
+      getNeededLevelOfWL().then((levelOfWL) => {
+        if (nivel + 1 >= levelOfWL) {
+          promoteToWL(message);
+        }
+      });
+    } else {
+      console.log("error! message.member.guild == undefined");
+    }
   } else {
     levels_db.sumar(`${message.guild.id}.${message.author.id}.xp`, randomxp);
     return;

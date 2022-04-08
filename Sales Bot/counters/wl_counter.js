@@ -15,7 +15,7 @@ function countWlMembers() {
         WlChannel.setName(`WL members: ${totalWlMembers} / 2000`);
 
         const glChannel = guild.channels.cache.get(config.channelsIds.totalGlMembers);
-        glChannel.setName(`GOLD LIST: ${glMemberCount} / 100`);
+        glChannel.setName(`OG List: ${glMemberCount} / 100`);
         
         
         // console.log(`Updating wl Member Count -> ${totalWlMembers}`);

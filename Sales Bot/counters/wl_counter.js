@@ -12,7 +12,7 @@ function countWlMembers() {
         totalWlMembers = (wlMemberCount + tochedByGodsCount);
         
         const WlChannel = guild.channels.cache.get(config.channelsIds.totalWlMembers);
-        WlChannel.setName(`WL members: ${totalWlMembers} / 2000`);
+        WlChannel.setName(`WL: ${totalWlMembers} / 150`);
 
         const glChannel = guild.channels.cache.get(config.channelsIds.totalGlMembers);
         glChannel.setName(`OG List: ${glMemberCount} / 100`);

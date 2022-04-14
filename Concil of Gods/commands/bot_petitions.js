@@ -340,6 +340,29 @@ client.on("message", async (message) => {
         message.react.tick;
         break;
 
+      case "see-all-collabs":
+        const embedDatos20 = new Discord.MessageEmbed()
+          .setTitle("REGLAS:")
+          .setAuthor(client.user.username, client.user.displayAvatarURL())
+          .setColor(0x00ae86)
+          .setFooter(
+            "Este es un importante mensaje de los dioses.",
+            client.user.avatarURL()
+          )
+          .setTimestamp()
+          .addField(
+            "🇬🇧 REACT WITH A ✅ TO SEE ALL THE COLLABS!!",
+            "_"
+          )
+          .addField(
+            "🇪🇸 REACCIONA CON ✅ PARA VER TODAS LAS COLABORACIONES!!",
+            "_"
+          )
+        message.channel.send({ embeds: [embedDatos20] }).then((embedDatos20) => {
+          embedDatos20.react("✅");
+        });
+        message.react.tick;  
+      break;
       case "oficial-links":
         const embedDatos10 = new Discord.MessageEmbed()
           .setTitle("LINKS:")

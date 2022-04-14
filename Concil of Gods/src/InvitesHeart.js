@@ -20,7 +20,7 @@ client.on("ready", () => {
     wl_db.establecer(myGuildId, {
       wl_members: 0,
     });
-  addEnglishRoleToAllHowDontChooseOne();
+  //addEnglishRoleToAllHowDontChooseOne();
   addLostInvites();
   // addItemsForInvites_db(100);
   cleanBddOnceADay();
@@ -442,24 +442,84 @@ function addNewPeopleTheTeamAddToWL() {
   console.log("================================================");
 }
 
+// Give a role to all the people who dont select the role
+
 function addEnglishRoleToAllHowDontChooseOne() {
   guild = client.guilds.cache.get(config.serverIds.sonsOfGodsGuildId);
   const role = guild.roles.fetch(config.roles.sonOfGod);
+  allWithSonsOfGodRole = [];
+  allWithSpanishRole = [];
+  allWithEnglishRole = [];
+
   guild.members.cache
     .filter((member) =>
       member.roles.cache.find((role) => role.id == config.roles.sonOfGod)
     )
+    .forEach((m) => {
+      allWithSonsOfGodRole.push(m);
+    });
+
+  guild.members.cache
     .filter((member) =>
-      member.roles.cache.find((role) => {
-        if (role.id == config.roles.sonOfGod) {
-          return;
-        }
-      })
+      member.roles.cache.find((role) => role.id == config.roles.spanish)
     )
     .forEach((m) => {
-      console.log(m.user.username);
+      allWithSpanishRole.push(m);
     });
+
+  guild.members.cache
+    .filter((member) =>
+      member.roles.cache.find((role) => role.id == config.roles.english)
+    )
+    .forEach((m) => {
+      allWithEnglishRole.push(m);
+    });
+
+  console.log(allWithSonsOfGodRole.length);
+  console.log(allWithSpanishRole.length);
+  console.log(allWithEnglishRole.length);
+
+  getOnlySonsOfGodsRole(
+    allWithSonsOfGodRole,
+    allWithSpanishRole,
+    allWithEnglishRole
+  ).then((result) => {
+    let englishRole = guild.roles.cache.get(config.roles.english);
+    let spanishRole = guild.roles.cache.get(config.roles.spanish);
+
+    guild.members.cache.filter((member) => {
+    }).forEach((member) => {
+      for (let i = 0; i < 2; i++) {
+        console.log(member);
+        
+      }
+    });
+
+    // for (let i = 0; i < result.length; i++) {
+    //   result[i].roles.add(englishRole);
+    // }
+  });
 }
+
+function getOnlySonsOfGodsRole(
+  allWithSonsOfGodRole,
+  allWithSpanishRole,
+  allWithEnglishRole
+) {
+  return new Promise((resolve) => {
+    for (let i = 0; i < allWithSonsOfGodRole.length; i++) {
+      if (
+        allWithSpanishRole.includes(allWithSonsOfGodRole[i]) ||
+        allWithEnglishRole.includes(allWithSonsOfGodRole[i])
+      ) {
+        allWithSonsOfGodRole.splice(i, 1);
+      }
+    }
+    resolve(allWithSonsOfGodRole);
+  });
+}
+
+// CLOSE Give a role to all the people who dont select the role
 
 // POLL ZONE //
 

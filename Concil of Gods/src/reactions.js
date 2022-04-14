@@ -1,11 +1,12 @@
 const { GuildInviteManager } = require("discord.js");
 var { client } = require("../commands/commands_file");
 const config = require("../config.json");
-
-client.on("messageReactionAdd", async (reaction, user) => {
   let lenguageMessage = config.messagesIds.lenguage;
   let welcomeMessage = config.messagesIds.welcome;
   let welcomeMessageES = config.messagesIds.welcomeES;
+  let seeAllCollabs = config.messagesIds.seeAllCollabs;
+
+client.on("messageReactionAdd", async (reaction, user) => {
 
   // When a reaction is received, check if the structure is partial
   if (reaction.partial) {
@@ -18,6 +19,8 @@ client.on("messageReactionAdd", async (reaction, user) => {
       return;
     }
   }
+
+  checkReactAllCollabs(reaction, user);
 
   if (
     (reaction.message.id == welcomeMessage ||
@@ -71,6 +74,8 @@ client.on("messageReactionRemove", (reaction, user) => {
   let welcomeMessage = config.messagesIds.welcome;
   let welcomeMessageES = config.messagesIds.welcomeES;
 
+  checkRemovedReactAllCollabs(reaction, user);
+
   if (
     (reaction.message.id == welcomeMessage ||
       reaction.message.id == welcomeMessageES) &&
@@ -118,4 +123,42 @@ client.on("messageReactionRemove", (reaction, user) => {
   }
 });
 
+
+function checkReactAllCollabs(reaction, user) {
+  if (
+    (reaction.message.id == seeAllCollabs) &&
+    reaction.emoji.name === "✅"
+  ) {
+    try {
+      let likeCollabs = reaction.message.guild.roles.cache.get(
+        config.roles.likeCollabs
+      );
+      let reactedUser = reaction.message.guild.members.cache.find(
+        (member) => member.id === user.id
+      );
+      reactedUser.roles.add(likeCollabs);
+    } catch {
+      console.log(console.error, "Error : can't add the like collabs role");
+    }
+  }
+}
+
+function checkRemovedReactAllCollabs(reaction, user) {
+  if (
+    (reaction.message.id == seeAllCollabs) &&
+    reaction.emoji.name === "✅"
+  ) {
+    let likeCollabs = reaction.message.guild.roles.cache.get(
+      config.roles.likeCollabs
+    );
+    let reactedUser = reaction.message.guild.members.cache.find(
+      (member) => member.id === user.id
+    );
+    try {
+      reactedUser.roles.remove(likeCollabs);
+    } catch {
+      console.log(console.error, "Error : can't remove the see all collabs role");
+    }
+  }
+}
 /*--- Close Reaction zone ---*/

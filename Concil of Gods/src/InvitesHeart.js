@@ -144,8 +144,13 @@ client.on("guildMemberAdd", async (member) => {
 
   let commonRole = guild.roles.cache.get(config.roles.sonOfGod);
   setTimeout(function () {
-    member.roles.add(commonRole);
-  }, 300000);
+    try {
+      millisTill10;
+    } catch (error) {
+      console.log("Probably the user already left the server" + error);
+      member.roles.add(commonRole);
+    }
+  }, 30000);
 
   const channel = member.guild.channels.cache.find(
     (channel) => channel.id === config.channelsIds.welcomeChannel
@@ -489,13 +494,13 @@ function addEnglishRoleToAllHowDontChooseOne() {
     let englishRole = guild.roles.cache.get(config.roles.english);
     let spanishRole = guild.roles.cache.get(config.roles.spanish);
 
-    guild.members.cache.filter((member) => {
-    }).forEach((member) => {
-      for (let i = 0; i < 2; i++) {
-        console.log(member);
-        
-      }
-    });
+    guild.members.cache
+      .filter((member) => {})
+      .forEach((member) => {
+        for (let i = 0; i < 2; i++) {
+          console.log(member);
+        }
+      });
 
     // for (let i = 0; i < result.length; i++) {
     //   result[i].roles.add(englishRole);

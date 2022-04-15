@@ -143,7 +143,9 @@ client.on("guildMemberAdd", async (member) => {
   guild = client.guilds.cache.get(config.serverIds.sonsOfGodsGuildId);
 
   let commonRole = guild.roles.cache.get(config.roles.sonOfGod);
-  member.roles.add(commonRole);
+  setTimeout(function () {
+    member.roles.add(commonRole);
+  }, 300000);
 
   const channel = member.guild.channels.cache.find(
     (channel) => channel.id === config.channelsIds.welcomeChannel

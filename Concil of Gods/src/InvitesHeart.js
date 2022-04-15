@@ -145,10 +145,9 @@ client.on("guildMemberAdd", async (member) => {
   let commonRole = guild.roles.cache.get(config.roles.sonOfGod);
   setTimeout(function () {
     try {
-      millisTill10;
+      member.roles.add(commonRole);
     } catch (error) {
       console.log("Probably the user already left the server" + error);
-      member.roles.add(commonRole);
     }
   }, 30000);
 

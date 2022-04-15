@@ -141,15 +141,16 @@ function removeUnusedInvites() {
 
 client.on("guildMemberAdd", async (member) => {
   guild = client.guilds.cache.get(config.serverIds.sonsOfGodsGuildId);
-
   let commonRole = guild.roles.cache.get(config.roles.sonOfGod);
-  setTimeout(function () {
-    if (member.roles != undefined) {
-      member.roles.add(commonRole);
-    } else {
-      console.log("Probably the user already left the server" + error);
-    }
-  }, 30000);
+
+  // setTimeout(function () {
+  //   if (guild.member(member.id)) {
+  //     member.roles.add(commonRole);
+
+  //   } else {
+  //     console.log("Probably the user already left the server" + error);
+  //   }
+  // }, 30000);
 
   const channel = member.guild.channels.cache.find(
     (channel) => channel.id === config.channelsIds.welcomeChannel

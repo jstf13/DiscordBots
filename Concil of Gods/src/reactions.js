@@ -5,6 +5,7 @@ const config = require("../config.json");
   let welcomeMessage = config.messagesIds.welcome;
   let welcomeMessageES = config.messagesIds.welcomeES;
   let seeAllCollabs = config.messagesIds.seeAllCollabs;
+  let giveAwayAndWl = config.messagesIds.giveAwayAndlMessage;
 
 client.on("messageReactionAdd", async (reaction, user) => {
 
@@ -21,6 +22,7 @@ client.on("messageReactionAdd", async (reaction, user) => {
   }
 
   checkReactAllCollabs(reaction, user);
+  checkReactGiveAway(reaction, user);
 
   if (
     (reaction.message.id == welcomeMessage ||
@@ -75,6 +77,7 @@ client.on("messageReactionRemove", (reaction, user) => {
   let welcomeMessageES = config.messagesIds.welcomeES;
 
   checkRemovedReactAllCollabs(reaction, user);
+  checkRemovingReactGiveAway(reaction, user);
 
   if (
     (reaction.message.id == welcomeMessage ||
@@ -143,6 +146,26 @@ function checkReactAllCollabs(reaction, user) {
   }
 }
 
+function checkReactGiveAway(reaction, user) {
+  if (
+    (reaction.message.id == giveAwayAndWl)
+  ) {
+    try {
+      let wlRole = reaction.message.guild.roles.cache.get(
+        config.roles.wlRole
+      );
+      let reactedUser = reaction.message.guild.members.cache.find(
+        (member) => member.id === user.id
+      );
+      reactedUser.roles.add(wlRole);
+    } catch {
+      console.log(console.error, "Error : can't add the wl role");
+    }
+  }
+}
+
+//Removing reactions
+
 function checkRemovedReactAllCollabs(reaction, user) {
   if (
     (reaction.message.id == seeAllCollabs) &&
@@ -158,6 +181,24 @@ function checkRemovedReactAllCollabs(reaction, user) {
       reactedUser.roles.remove(likeCollabs);
     } catch {
       console.log(console.error, "Error : can't remove the see all collabs role");
+    }
+  }
+}
+
+function checkRemovingReactGiveAway(reaction, user) {
+  if (
+    (reaction.message.id == giveAwayAndWl)
+  ) {
+    let wlRole = reaction.message.guild.roles.cache.get(
+      config.roles.wlRole
+    );
+    let reactedUser = reaction.message.guild.members.cache.find(
+      (member) => member.id === user.id
+    );
+    try {
+      reactedUser.roles.remove(wlRole);
+    } catch {
+      console.log(console.error, "Error : can't remove the wl role");
     }
   }
 }

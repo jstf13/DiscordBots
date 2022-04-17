@@ -363,6 +363,31 @@ client.on("message", async (message) => {
         });
         message.react.tick;  
       break;
+
+      case "see-games":
+        const embedDatos21 = new Discord.MessageEmbed()
+          .setTitle("GAMES:")
+          .setAuthor(client.user.username, client.user.displayAvatarURL())
+          .setColor(0x00ae86)
+          .setFooter(
+            "This is an important message from the gods.",
+            client.user.avatarURL()
+          )
+          .setTimestamp()
+          .addField(
+            "🇬🇧 REACT WITH A ✅ TO SEE GAMES CHANNELS!!",
+            "_"
+          )
+          .addField(
+            "🇪🇸 REACCIONA CON ✅ PARA VER LOS CANALES DE JUEGOS!!",
+            "_"
+          )
+        message.channel.send({ embeds: [embedDatos21] }).then((embedDatos21) => {
+          embedDatos21.react("✅");
+        });
+        message.react.tick;  
+      break;
+
       case "oficial-links":
         const embedDatos10 = new Discord.MessageEmbed()
           .setTitle("LINKS:")

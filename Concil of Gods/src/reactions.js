@@ -6,6 +6,7 @@ const config = require("../config.json");
   let welcomeMessageES = config.messagesIds.welcomeES;
   let seeAllCollabs = config.messagesIds.seeAllCollabs;
   let giveAwayAndWl = config.messagesIds.giveAwayAndlMessage;
+  let seeAllGames = config.messagesIds.seeAllGames;
 
 client.on("messageReactionAdd", async (reaction, user) => {
 
@@ -23,6 +24,7 @@ client.on("messageReactionAdd", async (reaction, user) => {
 
   checkReactAllCollabs(reaction, user);
   checkReactGiveAway(reaction, user);
+  checkReactGamer(reaction, user);
 
   if (
     (reaction.message.id == welcomeMessage ||
@@ -78,6 +80,7 @@ client.on("messageReactionRemove", (reaction, user) => {
 
   checkRemovedReactAllCollabs(reaction, user);
   checkRemovingReactGiveAway(reaction, user);
+  checkRemovedGamer(reaction, user);
 
   if (
     (reaction.message.id == welcomeMessage ||
@@ -164,6 +167,26 @@ function checkReactGiveAway(reaction, user) {
   }
 }
 
+function checkReactGamer(reaction, user) {
+  if (
+    (reaction.message.id == seeAllGames) &&
+    reaction.emoji.name === "✅"
+  ) {
+    try {
+      let gamer = reaction.message.guild.roles.cache.get(
+        config.roles.gamer
+      );
+      let reactedUser = reaction.message.guild.members.cache.find(
+        (member) => member.id === user.id
+      );
+      reactedUser.roles.add(gamer);
+    } catch {
+      console.log(console.error, "Error : can't add the gamer role");
+    }
+  }
+}
+
+
 //Removing reactions
 
 function checkRemovedReactAllCollabs(reaction, user) {
@@ -202,4 +225,24 @@ function checkRemovingReactGiveAway(reaction, user) {
     }
   }
 }
+
+function checkRemovedGamer(reaction, user) {
+  if (
+    (reaction.message.id == seeAllGames) &&
+    reaction.emoji.name === "✅"
+  ) {
+    let gamer = reaction.message.guild.roles.cache.get(
+      config.roles.gamer
+    );
+    let reactedUser = reaction.message.guild.members.cache.find(
+      (member) => member.id === user.id
+    );
+    try {
+      reactedUser.roles.remove(gamer);
+    } catch {
+      console.log(console.error, "Error : can't remove the gamer role");
+    }
+  }
+}
+
 /*--- Close Reaction zone ---*/

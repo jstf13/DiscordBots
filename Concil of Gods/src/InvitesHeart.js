@@ -50,12 +50,18 @@ function promoteToWL(invite) {
 
   getNeededLevelOfWL().then((neededLevelOfWL) => {
     if (neededLevelOfWL == 2) {
-      userToAddRole.roles.add(WLRole);
-      addUserToWLDataBase(userToAddRole).then((wasAdded) => {
-        if (wasAdded) {
-          promotedToWLMessage(invite);
-        }
-      });
+      if (guild.members.cache.get(userToAddRole.user.id) != undefined) {
+        userToAddRole.roles.add(WLRole);
+        addUserToWLDataBase(userToAddRole).then((wasAdded) => {
+          if (wasAdded) {
+            promotedToWLMessage(invite);
+          }
+        });
+      } else {
+        console.log(
+          "Probably the user " + member.user.tag + " already left the server"
+        );
+      }
     }
     level_db
       .find(`${invite.guild.id}`, (thisUser) => {
@@ -148,7 +154,9 @@ client.on("guildMemberAdd", async (member) => {
     if (guild.members.cache.get(member.user.id) != undefined) {
       member.roles.add(commonRole);
     } else {
-      console.log("Probably the user " + member.user.tag + " already left the server");
+      console.log(
+        "Probably the user " + member.user.tag + " already left the server"
+      );
     }
   }, 300000);
 

@@ -295,7 +295,6 @@ function checkRemovedDedicatedIdiom(reaction, user) {
         (member) => member.id === user.id
       );
       key = reaction.emoji.name;
-      console.dir(key);
       switch (key) {
         case "🇯🇵":
           let JP = reaction.message.guild.roles.cache.get(config.roles.JP);

@@ -388,6 +388,41 @@ client.on("message", async (message) => {
         message.react.tick;  
       break;
 
+      case "see-lenguages-channels":
+        const embedDatos22 = new Discord.MessageEmbed()
+          .setTitle("GAMES:")
+          .setAuthor(client.user.username, client.user.displayAvatarURL())
+          .setColor(0x00ae86)
+          .setFooter(
+            "This is an important message from the gods.",
+            client.user.avatarURL()
+          )
+          .setTimestamp()
+          .addField(
+            "🇬🇧 REACT WITH A FLAG TO SEE THE DEDICATED LENGUAGES CHANNELS!!",
+            "_"
+          )
+          .addField(
+            "🇪🇸 REACCIONA CON UNA BANDERA PARA VER LOS CANALES DE LENGUAGE DEDICADO!!",
+            "_"
+          )
+        message.channel.send({ embeds: [embedDatos22] }).then((embedDatos22) => {
+          embedDatos22.react("🇪🇸");
+          embedDatos22.react("🇬🇧");
+          embedDatos22.react("🇯🇵");
+          embedDatos22.react("🇰🇷");
+          embedDatos22.react("🇮🇳");
+          embedDatos22.react("🇫🇷");
+          embedDatos22.react("🇷🇺");
+          embedDatos22.react("🇬🇷");
+          embedDatos22.react("🇩🇪");
+          embedDatos22.react("🇵🇹");
+          embedDatos22.react("🇨🇳");
+          embedDatos22.react("🇮🇹");
+        });
+        message.react.tick;  
+      break;
+
       case "oficial-links":
         const embedDatos10 = new Discord.MessageEmbed()
           .setTitle("LINKS:")

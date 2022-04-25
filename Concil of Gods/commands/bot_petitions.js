@@ -179,7 +179,38 @@ client.on("message", async (message) => {
             message.channel.send({ embeds: [pollEmbed] });
           })
           .catch(console.error);
-        break;
+      break;
+
+      case "leaderboard":
+        const allUsers = [];
+        const allUsersIds = [];
+        const allInvites = [];
+        invites_db
+          .ordenar(`${message.guild.id}`, "validInvites", "desc")
+          .then(function (params) {
+            params.map((user) => {
+              isFromGods(user.valor.userId).then((isGod) => {
+                  if (isGod == false) {
+                    allUsers.push(user.valor.user);
+                    allUsersIds.push(user.valor.userId);
+                    allInvites.push(user.valor.validInvites);
+                  }
+                });
+            });
+          })
+          .then(() => {
+            let rankingEmbed = new Discord.MessageEmbed().setTitle("Poll");
+            rankingEmbed.setColor("GOLD");
+            rankingEmbed.addField("USERㅤㅤㅤㅤINVITES","ㅤㅤ",  true);
+            for (let i = 0; i < allUsers.length && i < 20; i++) {
+                  rankingEmbed.addField(`${allUsers[i]}`,`${i+1}ºㅤㅤㅤㅤㅤ${allInvites[i]}`, false);
+            }
+            
+            rankingEmbed.setFooter("This is the poll for the Free Son of God");
+            message.channel.send({ embeds: [rankingEmbed] });
+          })
+          .catch(console.error);    
+      break;
 
       case "mejorvideo":
         let best = new Discord.MessageEmbed()
@@ -790,3 +821,17 @@ client.on("message", async (message) => {
     }
   }
 });
+
+function isFromGods(userToCheck) {
+  return new Promise((mayor_resolve) => {
+    let is = false;
+    for (let j = 0; j < config.ignoredIds.length; j++) {
+      if (is == false) {
+        if (userToCheck === config.ignoredIds[j].id) {
+          is = true;
+        }
+      }
+    }
+        mayor_resolve(is);
+  });
+}

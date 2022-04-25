@@ -792,7 +792,7 @@ client.on("message", async (message) => {
         const helpEmbed = new Discord.MessageEmbed()
           .setTitle("COMANDS")
           .setColor(0x00ae86)
-          .setDescription(" !hola \n !adios \n " + " !invites \n  !level")
+          .setDescription(" !hola \n !adios \n " + " !invites \n  !level \n  !leaderboard")
           .setFooter(
             "The gods only will answer these questions",
             client.user.avatarURL()

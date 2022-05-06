@@ -214,7 +214,7 @@ client.on("message", async (message) => {
       break;
 
       case "wallet":
-        //if (message.channel.id === config.channelsIds.wlWalletRegistry) {
+        if (message.channel.id === config.channelsIds.wlWalletRegistry) {
           const user_wallet = RemoveCommand(message, comand);
 
           if (!wl_wallets_db.tiene(`${message.guild.id}.${message.author.id}`)){
@@ -236,10 +236,10 @@ client.on("message", async (message) => {
             message.reply(`Wallet updated to ${user_wallet}`);
             }
           }
-        //}
-        // else{
-        //   message.reply("You can only use this command in the Wl wallet registry channel <#972211485218574376>");
-        // }
+        }
+        else{
+          message.reply("You can only use this command in the Wl wallet registry channel <#972211485218574376>");
+        }
       break;
 
       case "mejorvideo":

@@ -5,6 +5,7 @@ const db = require("megadb");
 let levels_db = new db.crearDB("levels");
 let invites_db = new db.crearDB("invites");
 let invites_poll_db = new db.crearDB("invites_poll");
+let wl_wallets_db = new db.crearDB("wl_wallets");
 
 const config = require("../config.json");
 
@@ -210,6 +211,31 @@ client.on("message", async (message) => {
             message.channel.send({ embeds: [rankingEmbed] });
           })
           .catch(console.error);    
+      break;
+
+      case "wallet":
+        const user_wallet = RemoveCommand(message, comand);
+
+        if (!wl_wallets_db.tiene(`${message.guild.id}.${message.author.id}`)){
+          wl_wallets_db.establecer(`${message.guild.id}.${message.author.id}`, {
+            id: message.author.id,
+            tag: message.author.tag,
+            wallet: user_wallet
+          });
+        message.reply(`${message.author.tag} has created a wallet with the address: ${user_wallet}`);
+        }
+        else{
+          if(wl_wallets_db.tiene(`${message.guild.id}.${message.author.id}`)){
+            wl_wallets_db.eliminar(`${message.guild.id}.${message.author.id}`);
+            wl_wallets_db.establecer(`${message.guild.id}.${message.author.id}`, {
+              id: message.author.id,
+              tag: message.author.tag,
+              wallet: user_wallet
+          });
+          message.reply(`Wallet updated to ${user_wallet}`);
+          }
+        }
+
       break;
 
       case "mejorvideo":
@@ -834,4 +860,17 @@ function isFromGods(userToCheck) {
     }
         mayor_resolve(is);
   });
+}
+
+function RemoveCommand(message, comand) {
+  
+  const args = message.content
+  .slice(prefix.length + comand.length)
+  .trim()
+  .split(/ +/g);
+  return args.shift().toLocaleLowerCase();
+}
+
+function storeWallet(params) {
+  
 }

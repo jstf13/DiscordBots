@@ -214,28 +214,32 @@ client.on("message", async (message) => {
       break;
 
       case "wallet":
-        const user_wallet = RemoveCommand(message, comand);
+        if (message.channel.id === config.channelsIds.wlWalletRegistry) {
+          const user_wallet = RemoveCommand(message, comand);
 
-        if (!wl_wallets_db.tiene(`${message.guild.id}.${message.author.id}`)){
-          wl_wallets_db.establecer(`${message.guild.id}.${message.author.id}`, {
-            id: message.author.id,
-            tag: message.author.tag,
-            wallet: user_wallet
-          });
-        message.reply(`${message.author.tag} has created a wallet with the address: ${user_wallet}`);
-        }
-        else{
-          if(wl_wallets_db.tiene(`${message.guild.id}.${message.author.id}`)){
-            wl_wallets_db.eliminar(`${message.guild.id}.${message.author.id}`);
+          if (!wl_wallets_db.tiene(`${message.guild.id}.${message.author.id}`)){
             wl_wallets_db.establecer(`${message.guild.id}.${message.author.id}`, {
               id: message.author.id,
               tag: message.author.tag,
               wallet: user_wallet
-          });
-          message.reply(`Wallet updated to ${user_wallet}`);
+            });
+          message.reply(`${message.author.tag} has created a wallet with the address: ${user_wallet}`);
+          }
+          else{
+            if(wl_wallets_db.tiene(`${message.guild.id}.${message.author.id}`)){
+              wl_wallets_db.eliminar(`${message.guild.id}.${message.author.id}`);
+              wl_wallets_db.establecer(`${message.guild.id}.${message.author.id}`, {
+                id: message.author.id,
+                tag: message.author.tag,
+                wallet: user_wallet
+            });
+            message.reply(`Wallet updated to ${user_wallet}`);
+            }
           }
         }
-
+        else{
+          message.reply("You can only use this command in the Wl wallet registry channel");
+        }
       break;
 
       case "mejorvideo":

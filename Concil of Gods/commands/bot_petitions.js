@@ -238,7 +238,7 @@ client.on("message", async (message) => {
           }
         }
         else{
-          message.reply("You can only use this command in the Wl wallet registry channel");
+          message.reply("You can only use this command in the Wl wallet registry channel <#972211485218574376>");
         }
       break;
 
